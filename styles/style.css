@@ -524,6 +524,8 @@ footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-c
         justify-content: center;
         background: rgba(59, 130, 246, 0.1);
     }
+    .profile-img {
+    width: 160px; height: 160px;}
 }
 
 .nav-btn:hover {
@@ -535,4 +537,5 @@ footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-c
 
 .nav-btn::after {
     display: none; 
+
 }
