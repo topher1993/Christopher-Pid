@@ -238,20 +238,29 @@ const projectsData = {
     ],
     dev: [
         {
-            title: "BOM Auto-Formatter",
+            title: "CHTR Clothing E-Commerce",
             status: "Finished",
-            desc: "Python script to clean up messy Excel exports from CATIA.",
-            tech: ["Python", "Pandas", "OpenPyXL"],
-            thoughts: "Saved the team about 4 hours per week.",
-            link: "https://github.com/" // Add your real link here
+            desc: "A fully functional e-commerce platform built for a clothing brand. Handles user authentication, real-time product inventory, and secure data management.",
+            tech: ["React.js", "Firebase Auth", "Firestore DB", "Material UI"],
+            thoughts: "The biggest challenge was structuring the NoSQL database to handle variable product sizes and colors efficiently while keeping queries fast.",
+            link: "#" // Add the live link if you have one, or keep #
         },
         {
-            title: "Portfolio Website",
+            title: "Bio-Metric Health & Attendance",
+            status: "Finished",
+            desc: "An IoT-integrated web app that uses facial recognition for attendance while reading health data from ESP32 sensors.",
+            tech: ["Face-api.js", "ESP32 C++", "Node.js", "c++"],
+            thoughts: "Bridging the hardware-software gap was fun. I used WebSockets to stream data from the ESP32 directly to the client dashboard with near-zero latency.",
+            link: "#"
+        },
+        // Keeping your Python tool as a 3rd item is good (shows automation skills)
+        {
+            title: "CATIA BOM Auto-Formatter",
             status: "Ongoing",
-            desc: "The site you are looking at right now!",
-            tech: ["HTML5", "CSS3", "JavaScript", "Canvas API"],
-            thoughts: "Focusing on performance and interactive canvas elements.",
-            link: "#" 
+            desc: "Python automation script to clean up and structure raw Excel exports from CATIA for manufacturing teams.",
+            tech: ["Python", "Pandas", "OpenPyXL"],
+            thoughts: "Saved the engineering team approx. 4 hours/week by removing manual data entry errors.",
+            link: "https://github.com/topher1993"
         }
     ]
 };
