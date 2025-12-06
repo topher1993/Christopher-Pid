@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Christopher Pid - Resume</title>
+    
+    <!-- FontAwesome for the Button Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         /* --- RESET & BASICS --- */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; }
@@ -73,25 +77,72 @@
 
         /* --- EDUCATION & LANGUAGE --- */
         .edu-item { display: flex; justify-content: space-between; }
+
+        /* --- PRINT BUTTON STYLES (Accessible & Responsive) --- */
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .print-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+        }
+
+        /* Mobile Adjustments for Button */
+        @media (max-width: 800px) {
+            .page {
+                width: 100%;
+                margin: 0;
+                padding: 20px;
+                min-height: auto;
+            }
+            
+            /* Move button to bottom-right on mobile for thumb access */
+            .print-btn {
+                top: auto;
+                bottom: 30px;
+                right: 30px;
+                padding: 15px 30px; /* Larger touch target */
+                font-size: 1.1rem;
+            }
+        }
         
-        /* --- PRINT SETTINGS --- */
+        /* --- PRINT SETTINGS (Hides Button) --- */
         @media print {
             body { background: white; }
             .page { margin: 0; box-shadow: none; width: 100%; height: auto; padding: 0; }
-            .print-btn { display: none; }
-        }
-
-        /* Helper Button */
-        .print-btn {
-            position: fixed; top: 20px; right: 20px;
-            padding: 10px 20px; background: #2563eb; color: white;
-            border: none; border-radius: 5px; cursor: pointer; font-weight: bold;
+            
+            /* !important ensures this overrides any other display style */
+            .print-btn { display: none !important; } 
+            
+            /* Ensure links look clean in print */
+            a { text-decoration: none; color: #333; }
         }
     </style>
 </head>
 <body>
 
-    <button class="print-btn" onclick="window.print()">Save as PDF</button>
+    <!-- Accessible Save Button -->
+    <button class="print-btn" onclick="window.print()">
+        <i class="fas fa-file-pdf"></i> Save as PDF
+    </button>
 
     <div class="page">
         <!-- Header -->
@@ -112,7 +163,8 @@
             With over 10 years of experience in the automotive and manufacturing sectors, I specialize in CATIA V5 Surface Modeling 
             while leveraging Python and Full-Stack technologies (React, Node.js) to build automation tools that reduce design cycles and enhance team efficiency.
         </div>
-        <!-- Projects Section -->
+
+        <!-- NEW: Development Projects -->
         <div class="section-title">Key Development Projects</div>
 
         <div class="job-entry">
@@ -126,14 +178,14 @@
             <ul class="job-desc">
                 <li>Designed a contactless attendance system using <strong>Face-api.js</strong> for browser-based biometric recognition.</li>
                 <li>Integrated <strong>ESP32 Microcontrollers</strong> to transmit real-time body temperature and heart rate data via WebSockets.</li>
-                <li>Created a centralized admin dashboard for monitoring students health statistics and logs.</li>
+                <li>Created a centralized admin dashboard for monitoring employee health statistics and logs.</li>
             </ul>
         </div>
 
         <div class="job-entry">
             <div class="job-header">
                 <div>
-                    <div class="role">CHTR Clothing E-Commerce Platform(Collaborated)</div>
+                    <div class="role">CHTR Clothing E-Commerce Platform</div>
                     <div class="company">Client Project</div>
                 </div>
                 <div class="dates">2023</div>
@@ -144,9 +196,10 @@
                 <li>Developed a responsive UI focused on mobile-first customer experience.</li>
             </ul>
         </div>
+
         <!-- Experience -->
         <div class="section-title">Professional Experience</div>
-        
+
         <div class="job-entry">
             <div class="job-header">
                 <div>
@@ -190,7 +243,6 @@
                 <li>Collaborated with cross-functional teams to resolve manufacturing constraints during the design phase.</li>
             </ul>
         </div>
-        
 
         <!-- Skills -->
         <div class="section-title">Technical Skills</div>
