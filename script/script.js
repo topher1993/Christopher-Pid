@@ -401,3 +401,29 @@ async function handleSubmit(event) {
 }
 
 contactForm.addEventListener("submit", handleSubmit);
+
+// --- MOBILE MENU INTERACTION ---
+
+// Select elements
+const menuToggle = document.getElementById('menu-toggle');
+const navLinks = document.querySelector('.nav-links');
+const menuIcon = document.querySelector('.menu-icon');
+
+// 1. Close menu when clicking a link (Improvement)
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        menuToggle.checked = false;
+    });
+});
+
+// 2. Close menu when clicking OUTSIDE
+document.addEventListener('click', (e) => {
+    // If the menu is open...
+    if (menuToggle.checked) {
+        // AND the click is NOT on the menu itself
+        // AND the click is NOT on the hamburger icon
+        if (!navLinks.contains(e.target) && !menuIcon.contains(e.target) && e.target !== menuToggle) {
+            menuToggle.checked = false; // Close it
+        }
+    }
+});

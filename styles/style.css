@@ -511,27 +511,33 @@ footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-c
 /* Responsive */
 @media (max-width: 768px) {
       /* Hamburger Icon Styling */
-    .menu-icon { 
-        display: block; 
-        font-size: 1.8rem; 
-        cursor: pointer; 
-        color: white; 
-        z-index: 1001; /* Ensure it sits on top */
+    .menu-icon {
+        display: block;
+        font-size: 1.8rem;
+        cursor: pointer;
+        color: white;
+        z-index: 1001;
+        /* Add a background bubble to menu icon so it's visible over any content */
+        background: rgba(15, 23, 42, 0.6);
+        width: 45px; height: 45px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%;
+        backdrop-filter: blur(5px);
     }
     .nav-links {
         position: absolute; 
         top: 0; 
         right: 0; 
         height: 100vh; 
-        width: 70%;
-        background: rgba(15, 23, 42, 0.95); /* Solid dark background for menu */
-        backdrop-filter: blur(10px);
+        width: 75%;
+        background: rgba(2, 6, 23, 0.95); /* Deep dark blue */
+        backdrop-filter: blur(15px);
         flex-direction: column; 
         justify-content: center;
         align-items: center; 
         transform: translateX(100%); 
         transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+        box-shadow: -10px 0 30px rgba(0,0,0,0.5);
     }
        /* Show menu when checkbox is checked */
     #menu-toggle:checked ~ .nav-links { 
@@ -566,6 +572,41 @@ footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-c
         backdrop-filter: none; /* Removes blur effect */
         border-bottom: none;   /* Removes the line */
     }
+        /* 1. Navbar Transparency & Position */
+    nav {
+        background: transparent;
+        backdrop-filter: none;
+        border-bottom: none;
+        padding-top: 10px; /* Give logo some breathing room from top edge */
+    }
+
+        /* 2. Push the About Card Down */
+    #about {
+        /* Align content to start rather than center to prevent top cut-off */
+        align-items: flex-start; 
+        padding-top: 110px; /* Crucial: Pushes everything below the logo */
+        height: auto; /* Allow section to grow if content is tall */
+        min-height: 100vh;
+    }
+
+       .about-content-wrapper {
+        margin-top: 2rem; /* Extra gap between header and card */
+        padding: 2rem 1.5rem; /* Slightly smaller padding inside card */
+    }
+
+    /* 3. Button Spacing Fix */
+    .about-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem; /* Creates consistent space between buttons */
+    }
+    
+        .about-text .btn {
+        width: 100%;       /* Make buttons full width on mobile */
+        justify-content: center;
+        margin: 0;         /* Remove old margins to rely on gap */
+        max-width: 300px;  /* Stop them from getting too wide */
+    }
+
 }
-
-
