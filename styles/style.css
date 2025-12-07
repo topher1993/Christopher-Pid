@@ -633,3 +633,156 @@ footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-c
     }
 
 }
+
+
+/* --- AI Chatbot Widget --- */
+
+/* 1. The Floating Toggle Button */
+.chat-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
+    cursor: pointer;
+    z-index: 9999; /* On top of everything */
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.chat-toggle-btn:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* 2. The Chat Window (Hidden by default) */
+.chat-window {
+    position: fixed;
+    bottom: 90px; /* Above the button */
+    right: 20px;
+    width: 350px;
+    height: 500px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    z-index: 9998;
+    
+    /* Animation State: Closed */
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    pointer-events: none;
+    transition: 0.3s ease;
+    transform-origin: bottom right;
+}
+
+/* Animation State: Open */
+.chat-window.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+/* 3. Header */
+.chat-header {
+    background: linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(20, 184, 166, 0.1));
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h3 { font-size: 1rem; margin: 0; display: flex; align-items: center; gap: 8px; }
+.ai-status-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 5px #4ade80; }
+
+/* 4. Chat Messages Area */
+.chat-messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Scrollbar styling for chat */
+.chat-messages::-webkit-scrollbar { width: 5px; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 5px; }
+
+/* Message Bubbles */
+.message {
+    max-width: 80%;
+    padding: 0.8rem 1rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.bot-msg {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    align-self: flex-start;
+    border-bottom-left-radius: 2px;
+    border: 1px solid var(--border-color);
+}
+
+.user-msg {
+    background: var(--primary-color);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 2px;
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    font-size: 0.8rem; color: var(--text-light); margin-left: 10px; font-style: italic; display: none;
+}
+
+/* 5. Input Area */
+.chat-input-area {
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input {
+    flex: 1;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 0.6rem 1rem;
+    color: white;
+    outline: none;
+    font-family: inherit;
+}
+
+.chat-send-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
+}
+
+.chat-send-btn:hover { transform: scale(1.1); }
+
+/* Mobile Adjustment */
+@media (max-width: 480px) {
+    .chat-window { width: 90%; right: 5%; bottom: 80px; height: 60vh; }
+}

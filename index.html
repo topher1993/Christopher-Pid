@@ -210,6 +210,33 @@
         </div>
     </div>
 
+    <!-- AI Chatbot Widget -->
+    <div class="chat-toggle-btn" id="chatToggle">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <h3><div class="ai-status-dot"></div> Christopher's online persona</h3>
+            <button onclick="toggleChat()" style="background:none; border:none; color:white; cursor:pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <!-- Initial Greeting -->
+            <div class="message bot-msg">
+                Hi! I'm Christopher's online persona my knowledge-base are from Christopher's personal information, resume and projects. Ask me anything! 
+                <br><br><i>e.g., "What is his experience with CATIA?"</i>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">Christopher AI is typing...</div>
+
+        <form class="chat-input-area" id="chatForm">
+            <input type="text" id="userInput" class="chat-input" placeholder="Type your question..." autocomplete="off">
+            <button type="submit" class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+        </form>
+    </div>
+
         <!-- External JavaScript -->
     <script type="module" src="./script/script.js"></script>
 </body>

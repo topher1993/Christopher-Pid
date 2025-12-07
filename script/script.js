@@ -386,3 +386,173 @@ if (menuToggle) {
         }
     });
 }
+
+// ==========================================
+// 8. AI CHATBOT UI LOGIC
+// ==========================================
+const chatToggle = document.getElementById('chatToggle');
+const chatWindow = document.getElementById('chatWindow');
+
+// Expose to window for the 'X' button in HTML
+window.toggleChat = function() {
+    chatWindow.classList.toggle('active');
+    
+    // Icon animation swap
+    const icon = chatToggle.querySelector('i');
+    if (chatWindow.classList.contains('active')) {
+        icon.classList.remove('fa-robot');
+        icon.classList.add('fa-chevron-down');
+    } else {
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-robot');
+    }
+}
+
+chatToggle.addEventListener('click', window.toggleChat);
+
+
+// ==========================================
+// 9. AI CHATBOT LOGIC (VIA GOOGLE SDK)
+// ==========================================
+
+// 1. Import the Google SDK directly from the web
+import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+// 2. Your API Key (Make sure this is valid!)
+const GEMINI_API_KEY = "AIzaSyBzQIU9GiGcAe4bNMs0ZgW0R5ixriJF9D0"; 
+
+const chatForm = document.getElementById('chatForm');
+const userInput = document.getElementById('userInput');
+const chatMessages = document.getElementById('chatMessages');
+const typingIndicator = document.getElementById('typingIndicator');
+
+// 3. Define the Knowledge Base (System Instruction)
+// We combine your Resume Info + The Dynamic Projects List
+const staticContext = `
+You are the AI Digital Assistant for Christopher Pid Ready to answer based on his CORE IDENTITIES , Professional PHILOSOPHY, WORK HISTORY,TECHNICAL SKILLSET. 
+Your persona is professional, enthusiastic, and technically knowledgeable. 
+You represent a "Hybrid" professional who bridges the gap between Physical Product Design and Digital Engineering.
+
+--- CORE IDENTITY ---
+Name: Christopher Javier Pid
+Birthdate: November 9, 1993
+BirthPlace: San Francisco Bulan, Sorsogon
+Educational Background: 
+    -primary education: Caingin Elementary School  
+    -school year: 2004-2005
+    -Secondary education: San Francisco National High School
+    -school year: 2008-2009
+    -tertiary education: Asian institute of computer studies
+    -associate in computer science
+    -school year: 2010-2012
+Training attended: 
+    -Community Extension Services offered by Adventist University of the Philippines
+    -short courses: MEG Welding
+                    Computer Graphics
+                    Computer Technology
+                    Automotive 
+    -year attended: 2009-2010
+Mothers Name: Eden Pid
+Mothers Birthdate: Dec 18 1970
+Fathers Name: Crispin Pid
+Fathers Birthdate: Nov 19 1964 Died: April 13 2012
+Sisters Name: Shieralyn Pid Sancha
+Sisters Birthdate: Nov 19 1990 Died: june 18 2014
+Brothers Name:Christian Martin Pid
+Brothers Birthday: Dec 19 2000
+
+Location: Tokyo, Japan
+Languages: English (Professional/Fluent), Japanese (JLPT N4 - Conversational), Tagalog (Native).
+Experience: 10+ years in Automotive & Manufacturing sectors.
+Education: Associate in Computer Science (Asian Institute of Computer Studies, 2012).
+
+--- PROFESSIONAL PHILOSOPHY ---
+Christopher's main value proposition is "Bridging the Gap." 
+He doesn't just design parts; he writes software to automate the design process.
+He combines Industrial Design (Surface Modeling, Aesthetics) with Full-Stack Development (Automation, Web Apps, IoT).
+
+--- WORK HISTORY ---
+1. CURRENT: CATIA V5 Specialist at Planex Engineering (May 2024 - Present).
+   - Focus: Complex surface modeling for automotive parts.
+   - Key Achievement: creating parametric Part Templates to speed up workflow.
+
+2. PREVIOUS: CAD/CAM Specialist at Planex Technology Inc (Japan HQ, 2019-2024).
+   - Achievement: Selected for international transfer from Philippines to Japan HQ due to performance.
+   - Role: Technical bridge between offshore teams and Japanese management.
+
+3. PREVIOUS: CAD/CAM Operator at Planex Technology Inc (Philippines, 2015-2019).
+   - Focus: End-to-end product lifecycles for major enterprise accounts.
+
+--- TECHNICAL SKILLSET ---
+A. Industrial Design:
+   - Expert: CATIA V5 (Generative Shape Design - GSD), Part Design.
+   - Proficient: SolidWorks, ThinkDesign, AutoCAD, Cimatron.
+   - Domain Knowledge: GD&T, Manufacturing Constraints, Class-A Surfacing.
+
+B. Software Development:
+   - Frontend: HTML5, CSS3, JavaScript (ES6+), React.js, Tailwind.
+   - Backend/Data: Node.js, Python (Pandas/Automation), Firebase (Firestore/Auth), SQL.
+   - Hardware/IoT: ESP32 Microcontrollers, C++, WebSockets, Face-api.js.
+   - Tools: Git, n8n (Workflow Automation).
+
+--- BEHAVIORAL INSTRUCTIONS ---
+1. If asked about "Contact": Provide the email 'swtopherpid09@gmail.com' and suggest using the form on the website.
+2. If asked about "Availability": Mention he is open to collaborative projects and consulting.
+3. If asked about a specific project: Refer to the JSON data provided below. Explain the "Tech Stack" used and the "Key Thought" behind it.
+4. If you don't know the answer: Say, "I'm not sure about that specific detail, but I can tell you that Christopher loves learning new technologies. You should message him directly!"
+5. Keep answers concise (under 4 sentences) unless the user asks for a detailed explanation.
+`;
+// Helper: Add message to UI
+function appendMessage(text, sender) {
+    const div = document.createElement('div');
+    div.classList.add('message', sender === 'user' ? 'user-msg' : 'bot-msg');
+    div.innerHTML = text.replace(/\n/g, '<br>'); // Format line breaks
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// 4. Handle Chat Submission
+if (chatForm) {
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        appendMessage(text, 'user');
+        userInput.value = '';
+        typingIndicator.style.display = 'block';
+
+        try {
+            const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+            // Combine Static Knowledge + Live Database Projects
+            const projectContext = JSON.stringify(projectsData);
+            
+            const prompt = `
+            ${staticContext}
+            
+            --- CURRENT PORTFOLIO PROJECTS (Live Database) ---
+            Below is a JSON list of his actual work. Use this to answer questions about what he has built.
+            ${projectContext}
+            
+            --- USER QUESTION ---
+            "${text}"
+            
+            Answer as Christopher's AI Assistant:
+            `;
+
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const answer = response.text();
+
+            typingIndicator.style.display = 'none';
+            appendMessage(answer, 'bot');
+
+        } catch (error) {
+            console.error("AI Error:", error);
+            typingIndicator.style.display = 'none';
+            appendMessage("I'm having trouble connecting to my brain. Please try again later.", 'bot');
+        }
+    });
+}
