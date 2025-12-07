@@ -170,7 +170,8 @@ new ConstellationEffect('codeCanvas', { tags: fsCardData, baseColor: {r:59, g:13
 // ==========================================
 let projectsData = {
     design: [],
-    dev: []
+    dev: [],
+    hybrid: []
 };
 
 async function fetchProjects() {
@@ -178,15 +179,20 @@ async function fetchProjects() {
         const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
 
+        // Reset arrays
         projectsData.design = [];
         projectsData.dev = [];
+        projectsData.hybrid = []; // <--- Reset this one too
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
+            // Sort based on category string
             if (data.category === 'design') {
                 projectsData.design.push(data);
             } else if (data.category === 'dev') {
                 projectsData.dev.push(data);
+            } else if (data.category === 'hybrid') { // <--- NEW CHECK
+                projectsData.hybrid.push(data);
             }
         });
         console.log("Projects loaded:", projectsData);
@@ -206,8 +212,20 @@ const modalTitle = document.getElementById('modalTitle');
 const modalList = document.getElementById('modalProjectList');
 
 window.openModal = async function(category) {
+    console.log("Clicked category:", category);
     modalList.innerHTML = '';
-    modalTitle.innerText = category === 'design' ? "Industrial Design Projects" : "Development Projects";
+    // --- UPDATED TITLE LOGIC ---
+    let title = "";
+    if (category === 'design') {
+        title = "Industrial Design Projects";
+    } else if (category === 'dev') {
+        title = "Development Projects";
+    } else {
+        // This handles the new 'hybrid' category
+        title = "Hybrid Automation Solutions"; 
+    }
+    modalTitle.innerText = title;
+    // ---------------------------
     
     const data = projectsData[category];
 
@@ -438,10 +456,6 @@ Name: Christopher Javier Pid
 Birthdate: November 9, 1993
 BirthPlace: San Francisco Bulan, Sorsogon
 Educational Background: 
-    -primary education: Caingin Elementary School  
-    -school year: 2004-2005
-    -Secondary education: San Francisco National High School
-    -school year: 2008-2009
     -tertiary education: Asian institute of computer studies
     -associate in computer science
     -school year: 2010-2012
@@ -452,15 +466,6 @@ Training attended:
                     Computer Technology
                     Automotive 
     -year attended: 2009-2010
-Mothers Name: Eden Pid
-Mothers Birthdate: Dec 18 1970
-Fathers Name: Crispin Pid
-Fathers Birthdate: Nov 19 1964 Died: April 13 2012
-Sisters Name: Shieralyn Pid Sancha
-Sisters Birthdate: Nov 19 1990 Died: june 18 2014
-Brothers Name:Christian Martin Pid
-Brothers Birthday: Dec 19 2000
-
 Location: Tokyo, Japan
 Languages: English (Professional/Fluent), Japanese (JLPT N4 - Conversational), Tagalog (Native).
 Experience: 10+ years in Automotive & Manufacturing sectors.

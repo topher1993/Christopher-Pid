@@ -270,7 +270,16 @@ h2 { font-size: clamp(2rem, 4vw, 2.8rem); color: var(--text-main); margin-bottom
     transform: translateY(-5px);
     border-color: var(--primary-color);
 }
-
+.cat-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    opacity: 0;
+    transition: 0.3s;
+    /* ADD THIS LINE BELOW: */
+    pointer-events: none; /* Allows clicks to pass through to the card */
+}
 .design-cat:hover { border-color: var(--accent-color); }
 .dev-cat:hover { border-color: var(--primary-color); }
 
@@ -339,6 +348,48 @@ h2 { font-size: clamp(2rem, 4vw, 2.8rem); color: var(--text-main); margin-bottom
 }
 
 .modal-overlay.open .modal-container { transform: scale(1); }
+/* --- Hybrid Card Styles --- */
+
+
+.hybrid-cat {
+    /* Standard State: Normal Image + Solid Gray Border */
+    background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.95)), 
+                      url('https://images.unsplash.com/photo-1616198814651-e71f960c3180?q=80&w=1000&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    border: 2px solid var(--border-color); /* Starts simple */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+.hybrid-cat:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.25); /* Subtle glow */
+    
+    /* 1. Make the physical border transparent so the gradient shines through */
+    border-color: transparent;
+
+    /* 2. Define the layers:
+       - Layer 1 (Top): Dark Overlay (constrained to padding-box)
+       - Layer 2 (Middle): The Image (constrained to padding-box)
+       - Layer 3 (Bottom): The Gradient from Blue -> Teal (extends to border-box) 
+    */
+    background-image: 
+        linear-gradient(to bottom, rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.95)), 
+        url('https://images.unsplash.com/photo-1616198814651-e71f960c3180?q=80&w=1000&auto=format&fit=crop'),
+        linear-gradient(to right, var(--accent-color), var(--primary-color)); /* The Dev->Design Gradient */
+
+    /* 3. Tell CSS where to cut each layer */
+    background-origin: padding-box, padding-box, border-box;
+    background-clip: padding-box, padding-box, border-box;
+}
+
+.hybrid-cat:hover .cat-icon {
+    background: linear-gradient(to right, var(--accent-color), var(--primary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: 0.3s;
+}
 
 .modal-header {
     padding: 1.5rem 2rem;
@@ -786,3 +837,4 @@ footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-c
 @media (max-width: 480px) {
     .chat-window { width: 90%; right: 5%; bottom: 80px; height: 60vh; }
 }
+
