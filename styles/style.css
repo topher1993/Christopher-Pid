@@ -64,12 +64,31 @@ nav {
     height: 100%;
 }
 
-.logo {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: linear-gradient(to right, var(--accent-color), var(--primary-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+/* --- Logo Styles --- */
+
+/* Wrapper to make the logo clickable */
+.logo-link {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    text-decoration: none; /* Removes underline if any */
+}
+
+.logo-img {
+    height: 100px; /* Adjust this height to match your nav size */
+    width: auto;  /* Maintain aspect ratio */
+    object-fit: contain;
+    filter: drop-shadow(0 0 4px rgba(45, 108, 190, 0.6));
+    /* OPTIONAL: If your logo is black text on white and you want to 
+       remove the white box purely with code, uncomment the line below: */
+    /* mix-blend-mode: screen; */ 
+    
+    transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+    transform: scale(1.05); /* Subtle zoom on hover */
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6)); /* Glow effect matching your theme */
 }
 
 .nav-links { display: flex; gap: 2.5rem; }
@@ -511,6 +530,10 @@ footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-c
 /* Responsive */
 @media (max-width: 768px) {
       /* Hamburger Icon Styling */
+
+          .logo-img {
+        height: 90px; /* Slightly smaller on mobile */
+    }
     .menu-icon {
         display: block;
         font-size: 1.8rem;

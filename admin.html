@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Add Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/style.css">
+    <style>
+        /* Admin-specific styles */
+        body { padding: 4rem; display: block; height: auto; }
+        .admin-container { max-width: 800px; margin: 0 auto; background: rgba(15, 23, 42, 0.9); padding: 2rem; border-radius: 15px; border: 1px solid var(--border-color); }
+        h1 { margin-bottom: 2rem; text-align: center; color: var(--primary-color); }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .note { font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <h1><i class="fas fa-database"></i> Add New Project</h1>
+        
+        <form id="project-form">
+            <!-- 1. Category & ID -->
+            <div class="row">
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="cat" class="form-control" style="background:#0f172a; color:white;" required>
+                        <option value="design">Industrial Design</option>
+                        <option value="dev">Development</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Project ID (Slug)</label>
+                    <input type="text" id="slug" class="form-control" placeholder="e.g. chtr-clothing" required>
+                    <p class="note">No spaces. Used for DB identification.</p>
+                </div>
+            </div>
+
+            <!-- 2. Basic Info -->
+            <div class="row">
+                <div class="form-group">
+                    <label>Project Title</label>
+                    <input type="text" id="title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="status" class="form-control" style="background:#0f172a; color:white;">
+                        <option value="Finished">Finished</option>
+                        <option value="Ongoing">Ongoing</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 3. Labels -->
+            <div class="row">
+                <div class="form-group">
+                    <label>Type (Paid/Personal)</label>
+                    <input type="text" id="type" class="form-control" placeholder="Paid Project" required>
+                </div>
+                <div class="form-group">
+                    <label>Role (Solo/Collab)</label>
+                    <input type="text" id="roleType" class="form-control" placeholder="Full Stack (Solo)" required>
+                </div>
+            </div>
+
+            <!-- 4. Details -->
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="desc" class="form-control" rows="3" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Key Thoughts</label>
+                <textarea id="thoughts" class="form-control" rows="2" required></textarea>
+            </div>
+
+            <!-- 5. Tech & Links -->
+            <div class="row">
+                <div class="form-group">
+                    <label>Tech Stack (Comma separated)</label>
+                    <input type="text" id="tech" class="form-control" placeholder="React, Firebase, CSS" required>
+                </div>
+                <div class="form-group">
+                    <label>External Link URL</label>
+                    <input type="text" id="link" class="form-control" placeholder="https://..." value="#">
+                </div>
+            </div>
+
+            <button type="submit" id="save-btn" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 2rem;">
+                Upload to Database <i class="fas fa-cloud-upload-alt"></i>
+            </button>
+            <p id="admin-status" style="text-align:center; margin-top:1rem;"></p>
+        </form>
+    </div>
+
+    <script type="module">
+        import { db } from './script/firebase-config.js';
+        import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        document.getElementById('project-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('save-btn');
+            const status = document.getElementById('admin-status');
+            const slug = document.getElementById('slug').value.trim();
+
+            btn.innerHTML = 'Uploading...';
+            btn.disabled = true;
+
+            // Prepare Data
+            const projectData = {
+                id: slug,
+                category: document.getElementById('cat').value, // 'design' or 'dev'
+                title: document.getElementById('title').value,
+                status: document.getElementById('status').value,
+                type: document.getElementById('type').value,
+                roleType: document.getElementById('roleType').value,
+                desc: document.getElementById('desc').value,
+                thoughts: document.getElementById('thoughts').value,
+                link: document.getElementById('link').value,
+                // Split string by comma to create an Array
+                tech: document.getElementById('tech').value.split(',').map(item => item.trim()), 
+                createdAt: serverTimestamp()
+            };
+
+            try {
+                // Use setDoc to define our own custom ID (the slug) instead of a random ID
+                await setDoc(doc(db, "projects", slug), projectData);
+                
+                status.innerText = "Success! Project added.";
+                status.style.color = "#4ade80";
+                document.getElementById('project-form').reset();
+            } catch (error) {
+                console.error(error);
+                status.innerText = "Error: " + error.message;
+                status.style.color = "#f87171";
+            } finally {
+                btn.innerHTML = 'Upload to Database <i class="fas fa-cloud-upload-alt"></i>';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

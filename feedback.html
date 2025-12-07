@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave a Review - Christopher Pid</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/style.css">
+
+    <style>
+        /* Keep previous styles */
+        body {
+            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;
+        }
+        .feedback-container {
+            background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color); border-radius: 20px;
+            padding: 3rem; max-width: 600px; width: 100%;
+        }
+        .feedback-header { text-align: center; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+
+    <div class="feedback-container">
+        <div class="feedback-header">
+            <h1>Project Feedback</h1>
+            <p>Thank you for collaborating!</p>
+        </div>
+
+        <form id="feedback-form">
+            <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" id="clientName" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label>Your Title / Role</label>
+                <input type="text" id="clientRole" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label>Project</label>
+                <!-- IMPORTANT: The values here must match the IDs in script.js -->
+                <select id="projectId" class="form-control" style="background:#0f172a; color:white;" required>
+                    <option value="" disabled selected>Select the project...</option>
+                    <option value="chtr-clothing">CHTR Clothing E-Commerce</option>
+                    <option value="biometric-iot">Bio-Metric Health (IoT)</option>
+                    <option value="mirror-housing">Automotive Mirror Housing</option>
+                    <option value="bom-tool">BOM Auto-Formatter</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Experience & Feedback</label>
+                <textarea id="reviewText" class="form-control" style="min-height: 150px;" required></textarea>
+            </div>
+
+            <p id="feedback-status" style="margin-bottom: 1rem; text-align: center; display:none;"></p>
+
+            <button type="submit" id="fb-btn" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                Submit Review <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="index.html" style="color: var(--text-light);">&larr; Back to Portfolio</a>
+        </div>
+    </div>
+
+    <!-- MODULE SCRIPT -->
+    <script type="module" src="./script/feedback-script.js"></script>
+</body>
+</html>

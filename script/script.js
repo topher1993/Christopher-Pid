@@ -1,11 +1,18 @@
-// --- Scroll Reveal Animation ---
+// ==========================================
+// 1. IMPORTS & SETUP
+// ==========================================
+import { db } from './firebase-config.js';
+import { collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// ==========================================
+// 2. SCROLL REVEAL ANIMATION
+// ==========================================
 function reveal() {
     var reveals = document.querySelectorAll(".reveal");
     for (var i = 0; i < reveals.length; i++) {
         var windowHeight = window.innerHeight;
         var elementTop = reveals[i].getBoundingClientRect().top;
-        var elementVisible = 150;
-        if (elementTop < windowHeight - elementVisible) {
+        if (elementTop < windowHeight - 150) {
             reveals[i].classList.add("active");
         }
     }
@@ -13,30 +20,29 @@ function reveal() {
 window.addEventListener("scroll", reveal);
 reveal();
 
-// --- DATA: The Mind Map ---
-// Cluster 1: Industrial Design
+// ==========================================
+// 3. CONSTELLATION / MIND MAP ANIMATION
+// ==========================================
+
+// --- DATA: The Mind Map Tags ---
 const idTags = [
-    "Design Thinking", "User Research", "Sketching", "Ergonomics","Generative Shape Design","Part Design", // Process
-    "CAD", "Rendering", "Prototyping", "Manufacturing",            // Technical
-    "CMF", "Form Giving", "Sustainability",                        // Aesthetic
-    "SolidWorks", "Rhino", "KeyShot", "Adobe CC","Catia v5"        // Tools
+    "Design Thinking", "User Research", "Sketching", "Ergonomics","Generative Shape Design","Part Design",
+    "CAD", "Rendering", "Prototyping", "Manufacturing", "CMF", "Form Giving", "Sustainability",
+    "SolidWorks", "Rhino", "KeyShot", "Adobe CC","Catia v5"
 ];
 
-// Cluster 2: Full Stack Dev
 const fsTags = [
-    "HTML/CSS/JS", "React", "Redux", "Tailwind",                   // Frontend
-    "Node.js", "API Design", "Auth",                               // Backend
-    "SQL", "MongoDB", "Redis",                                     // Data
-    "Git", "Docker", "AWS", "CI/CD"                                // DevOps
+    "HTML/CSS/JS", "React", "Redux", "Tailwind",
+    "Node.js", "API Design", "Auth", "SQL", "MongoDB", "Redis",
+    "Git", "Docker", "AWS", "CI/CD"
 ];
 
-// Cluster 3: The Hybrid Bridge
 const bridgeTags = [
     "Physical-Digital", "IoT", "Interaction Design", 
     "Digital Fabrication", "Three.js", "WebGL"
 ];
 
-// --- Mind Map Constellation Class ---
+// --- Class Definition ---
 class ConstellationEffect {
     constructor(canvasId, options) {
         this.canvas = document.getElementById(canvasId);
@@ -47,17 +53,13 @@ class ConstellationEffect {
         this.height = 0;
         this.particles = [];
 
-        // Options
-        this.tags = options.tags || []; // Words to display
-        this.baseColor = options.baseColor || {r:255, g:255, b:255}; // Fallback color
-        this.enableText = options.enableText !== false; // Default true
-        this.density = options.density || 1; // Multiplier for extra nodes
-        
-        // Configuration for "Distinct Lines"
+        this.tags = options.tags || [];
+        this.baseColor = options.baseColor || {r:255, g:255, b:255};
+        this.enableText = options.enableText !== false;
+        this.density = options.density || 1;
         this.lineDist = options.lineDist || 130;
         this.lineWidth = options.lineWidth || 0.8; 
 
-        // Bind resize
         window.addEventListener('resize', () => this.resize());
         this.resize();
         this.init();
@@ -73,29 +75,21 @@ class ConstellationEffect {
 
     init() {
         this.particles = [];
-
-        // 1. Create Particles for TEXT tags (The Main Nodes)
+        // Text Nodes
         if (this.tags.length > 0) {
             this.tags.forEach(tagObj => {
-                // If tagObj is just a string, convert to object with base color
                 let text = typeof tagObj === 'string' ? tagObj : tagObj.text;
                 let color = typeof tagObj === 'string' ? `rgba(${this.baseColor.r},${this.baseColor.g},${this.baseColor.b}, 1)` : tagObj.color;
-
                 this.particles.push({
                     x: Math.random() * this.width,
                     y: Math.random() * this.height,
-                    vx: (Math.random() - 0.5) * 0.3, // Slower for text readability
+                    vx: (Math.random() - 0.5) * 0.3,
                     vy: (Math.random() - 0.5) * 0.3,
-                    size: 3, // Main nodes are bigger
-                    text: text,
-                    isNode: true,
-                    color: color
+                    size: 3, text: text, isNode: true, color: color
                 });
             });
         }
-
-        // 2. Create "Satellite" Particles (Extra nodes for density)
-        // We add extra dots to make the network look dense without adding too much text
+        // Satellite Nodes
         const extraParticles = 40 * this.density; 
         for (let i = 0; i < extraParticles; i++) {
             this.particles.push({
@@ -103,9 +97,8 @@ class ConstellationEffect {
                 y: Math.random() * this.height,
                 vx: (Math.random() - 0.5) * 0.5,
                 vy: (Math.random() - 0.5) * 0.5,
-                size: Math.random() * 1.5 + 0.5, // Satellites are smaller
-                text: null,
-                isNode: false,
+                size: Math.random() * 1.5 + 0.5,
+                text: null, isNode: false,
                 color: `rgba(${this.baseColor.r},${this.baseColor.g},${this.baseColor.b}, 0.5)`
             });
         }
@@ -113,54 +106,37 @@ class ConstellationEffect {
 
     animate() {
         this.ctx.clearRect(0, 0, this.width, this.height);
-
-        // Update & Draw Particles
         this.particles.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-
-            // Bounce
+            p.x += p.vx; p.y += p.vy;
             if (p.x < 0 || p.x > this.width) p.vx *= -1;
             if (p.y < 0 || p.y > this.height) p.vy *= -1;
 
-            // Draw Dot
             this.ctx.fillStyle = p.color;
             this.ctx.beginPath();
             this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             this.ctx.fill();
 
-            // Draw Text (Only for Main Nodes)
             if (p.isNode && this.enableText) {
-                this.ctx.font = "10px Inter"; // Small font
-                this.ctx.fillStyle = p.color.replace('1)', '0.7)'); // Slightly transparent text
+                this.ctx.font = "10px Inter";
+                this.ctx.fillStyle = p.color.replace('1)', '0.7)');
                 this.ctx.fillText(p.text, p.x + 8, p.y + 3);
             }
         });
 
-        // Draw Connections
-        // We optimized this loop to connect nearby nodes
         for (let i = 0; i < this.particles.length; i++) {
             for (let j = i + 1; j < this.particles.length; j++) {
                 const p1 = this.particles[i];
                 const p2 = this.particles[j];
-                const dx = p1.x - p2.x;
-                const dy = p1.y - p2.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
+                const dist = Math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2);
 
                 if (dist < this.lineDist) {
                     this.ctx.beginPath();
-                    // Distinct lines: Higher opacity logic
                     const alpha = 1 - (dist / this.lineDist); 
-                    
-                    // Logic: If both particles have the same color, use that color. 
-                    // If mixed, use a neutral gray.
                     if(p1.color === p2.color) {
-                         // Extract RGB from the rgba string to apply new alpha
                          this.ctx.strokeStyle = p1.color.replace('1)', `${alpha})`).replace('0.5)', `${alpha})`);
                     } else {
-                        this.ctx.strokeStyle = `rgba(148, 163, 184, ${alpha * 0.5})`; // Grey for mixing clusters
+                        this.ctx.strokeStyle = `rgba(148, 163, 184, ${alpha * 0.5})`;
                     }
-
                     this.ctx.lineWidth = this.lineWidth;
                     this.ctx.moveTo(p1.x, p1.y);
                     this.ctx.lineTo(p2.x, p2.y);
@@ -168,271 +144,245 @@ class ConstellationEffect {
                 }
             }
         }
-
         requestAnimationFrame(this.animate.bind(this));
     }
 }
 
-// --- INITIALIZE ANIMATIONS ---
-
-// 1. HERO SECTION: The Convergence (Hybrid)
-// We merge all three lists, assigning specific colors to visualize the distinct clusters merging.
+// --- Initialize Animations ---
 const heroData = [
-    ...idTags.map(t => ({ text: t, color: "rgba(20, 184, 166, 1)" })),  // Teal
-    ...fsTags.map(t => ({ text: t, color: "rgba(59, 130, 246, 1)" })),  // Blue
-    ...bridgeTags.map(t => ({ text: t, color: "rgba(255, 255, 255, 1)" })) // White (The Bridge)
+    ...idTags.map(t => ({ text: t, color: "rgba(20, 184, 166, 1)" })),
+    ...fsTags.map(t => ({ text: t, color: "rgba(59, 130, 246, 1)" })),
+    ...bridgeTags.map(t => ({ text: t, color: "rgba(255, 255, 255, 1)" }))
 ];
 
-new ConstellationEffect('heroCanvas', { 
-    tags: heroData,
-    lineDist: 120,
-    lineWidth: 0.6,
-    density: 1.5 // High density for the hero section
-});
-
-
-// 2. ID EXPERTISE CARD
-// Only use ID tags. Color: Teal
+// 1. Hero Canvas
+new ConstellationEffect('heroCanvas', { tags: heroData, lineDist: 120, lineWidth: 0.6, density: 1.5 });
+// 2. ID Card Canvas
 const idCardData = idTags.map(t => ({ text: t, color: "rgba(20, 184, 166, 1)" }));
-
-new ConstellationEffect('designCanvas', { 
-    tags: idCardData,
-    baseColor: {r:20, g:184, b:166},
-    lineDist: 100,
-    density: 0.8,
-    enableText: true // Show text inside the card
-});
-
-
-// 3. FULL STACK EXPERTISE CARD
-// Only use FS tags. Color: Blue
+new ConstellationEffect('designCanvas', { tags: idCardData, baseColor: {r:20, g:184, b:166}, lineDist: 100, density: 0.8, enableText: true });
+// 3. Dev Card Canvas
 const fsCardData = fsTags.map(t => ({ text: t, color: "rgba(59, 130, 246, 1)" }));
+new ConstellationEffect('codeCanvas', { tags: fsCardData, baseColor: {r:59, g:130, b:246}, lineDist: 100, density: 0.8, enableText: true });
 
-new ConstellationEffect('codeCanvas', { 
-    tags: fsCardData,
-    baseColor: {r:59, g:130, b:246},
-    lineDist: 100,
-    density: 0.8,
-    enableText: true
-});
-// --- PROJECT DATA & MODAL LOGIC ---
 
-const projectsData = {
-    design: [
-        {
-            title: "Automotive Mirror Housing",
-            status: "Finished",
-            desc: "A complex aesthetic surface study for a luxury vehicle side mirror.",
-            tech: ["CATIA V5", "GSD", "Rendering"],
-            thoughts: "The main challenge was maintaining G2 continuity across the primary housing curves.",
-            link: "https://www.behance.net/" // Add your real link here
-        },
-        {
-            title: "Ergonomic Handheld Device",
-            status: "Ongoing",
-            desc: "Concept design for a medical scanner focusing on grip comfort.",
-            tech: ["SolidWorks", "3D Printing", "User Testing"],
-            thoughts: "Currently iterating on the handle thickness based on user feedback.",
-            link: "#"
-        }
-    ],
-    dev: [
-        {
-            title: "CHTR Clothing E-Commerce",
-            status: "Finished",
-            desc: "A fully functional e-commerce platform built for a clothing brand. Handles user authentication, real-time product inventory, and secure data management.",
-            tech: ["React.js", "Firebase Auth", "Firestore DB", "Material UI"],
-            thoughts: "The biggest challenge was structuring the NoSQL database to handle variable product sizes and colors efficiently while keeping queries fast.",
-            link: "#" // Add the live link if you have one, or keep #
-        },
-        {
-            title: "Bio-Metric Health & Attendance",
-            status: "Finished",
-            desc: "An IoT-integrated web app that uses facial recognition for attendance while reading health data from ESP32 sensors.",
-            tech: ["Face-api.js", "ESP32 C++", "Node.js", "c++"],
-            thoughts: "Bridging the hardware-software gap was fun. I used WebSockets to stream data from the ESP32 directly to the client dashboard with near-zero latency.",
-            link: "#"
-        },
-        // Keeping your Python tool as a 3rd item is good (shows automation skills)
-        {
-            title: "CATIA BOM Auto-Formatter",
-            status: "Ongoing",
-            desc: "Python automation script to clean up and structure raw Excel exports from CATIA for manufacturing teams.",
-            tech: ["Python", "Pandas", "OpenPyXL"],
-            thoughts: "Saved the engineering team approx. 4 hours/week by removing manual data entry errors.",
-            link: "https://github.com/topher1993"
-        }
-    ]
+// ==========================================
+// 4. FIREBASE PROJECT FETCHING
+// ==========================================
+let projectsData = {
+    design: [],
+    dev: []
 };
 
-// 2. Modal Functions
+async function fetchProjects() {
+    try {
+        const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+
+        projectsData.design = [];
+        projectsData.dev = [];
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.category === 'design') {
+                projectsData.design.push(data);
+            } else if (data.category === 'dev') {
+                projectsData.dev.push(data);
+            }
+        });
+        console.log("Projects loaded:", projectsData);
+    } catch (error) {
+        console.error("Error fetching projects:", error);
+    }
+}
+// Load projects immediately
+document.addEventListener("DOMContentLoaded", fetchProjects);
+
+
+// ==========================================
+// 5. MODAL LOGIC (With Reviews)
+// ==========================================
 const modal = document.getElementById('projectModal');
 const modalTitle = document.getElementById('modalTitle');
 const modalList = document.getElementById('modalProjectList');
 
-function openModal(category) {
+window.openModal = async function(category) {
     modalList.innerHTML = '';
-    
-    // Set Title
     modalTitle.innerText = category === 'design' ? "Industrial Design Projects" : "Development Projects";
     
     const data = projectsData[category];
 
-    data.forEach((project) => {
-        const statusClass = project.status === 'Finished' ? 'status-done' : 'status-ongoing';
-        
-        // We render the Link Button only if a link exists and isn't just "#"
-        const linkHtml = project.link && project.link !== "#" 
-            ? `<a href="${project.link}" target="_blank" class="modal-btn">View Project <i class="fas fa-external-link-alt"></i></a>` 
-            : '';
+    // If no data loaded yet (or empty)
+    if (!data || data.length === 0) {
+        modalList.innerHTML = '<p style="text-align:center; color:#94a3b8;">Loading projects from database...</p>';
+        // Optional: Retry fetch or just wait
+        if (data && data.length === 0) {
+            modalList.innerHTML = '<p style="text-align:center; color:#94a3b8;">No projects found in this category yet.</p>';
+        }
+        return;
+    }
 
-        const html = `
-            <div class="project-item" onclick="toggleDetails(this)">
-                <div class="project-summary">
-                    <div class="project-title">
-                        <h4>${project.title} <span class="project-status ${statusClass}">${project.status}</span></h4>
-                    </div>
-                    <i class="fas fa-chevron-down toggle-icon"></i>
+    for (const project of data) {
+        const statusClass = project.status === 'Finished' ? 'status-done' : 'status-ongoing';
+        const linkHtml = project.link && project.link !== "#" ? `<a href="${project.link}" target="_blank" class="modal-btn">View Project <i class="fas fa-external-link-alt"></i></a>` : '';
+        
+        const typeBadgeClass = project.type.includes("Paid") ? "badge-paid" : "badge-personal";
+        const roleBadgeClass = project.roleType.includes("Solo") ? "badge-solo" : "badge-collab";
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'project-item';
+        itemDiv.onclick = () => toggleDetails(itemDiv, project.id);
+
+        itemDiv.innerHTML = `
+            <div class="project-summary">
+                <div class="project-title">
+                    <h4>${project.title} <span class="project-status ${statusClass}">${project.status}</span></h4>
                 </div>
-                <div class="project-details">
-                    <div class="detail-section">
-                        <h5>Description</h5>
-                        <p>${project.desc}</p>
-                    </div>
-                    <div class="detail-section">
-                        <h5>Technologies</h5>
-                        <div class="tech-tags">
-                            ${project.tech.map(t => `<span>${t}</span>`).join('')}
-                        </div>
-                    </div>
-                    <div class="detail-section">
-                        <h5>Key Thoughts</h5>
-                        <p style="font-style: italic; color: #94a3b8;">"${project.thoughts}"</p>
-                    </div>
-                    <!-- The New Link Button -->
-                    ${linkHtml}
+                <i class="fas fa-chevron-down toggle-icon"></i>
+            </div>
+            <div class="project-details">
+                <div class="modal-meta-tags">
+                    <span class="meta-badge ${typeBadgeClass}">${project.type}</span>
+                    <span class="meta-badge ${roleBadgeClass}">${project.roleType}</span>
                 </div>
+                <div class="detail-section"><h5>Description</h5><p>${project.desc}</p></div>
+                <div class="detail-section">
+                    <h5>Technologies</h5>
+                    <div class="tech-tags">${project.tech.map(t => `<span>${t}</span>`).join('')}</div>
+                </div>
+                <div class="detail-section">
+                    <h5>Key Thoughts</h5>
+                    <p style="font-style: italic; color: #94a3b8;">"${project.thoughts}"</p>
+                </div>
+                <div id="review-container-${project.id}"></div>
+                ${linkHtml}
             </div>
         `;
-        modalList.innerHTML += html;
-    });
+        modalList.appendChild(itemDiv);
+    }
 
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
 }
 
-function closeModal() {
+window.closeModal = function() {
     modal.classList.remove('open');
     document.body.style.overflow = 'auto';
 }
 
-window.onclick = function(event) {
-    if (event.target == modal) {
-        closeModal();
+window.toggleDetails = async function(element, projectId) {
+    document.querySelectorAll('.project-item').forEach(item => {
+        if (item !== element) item.classList.remove('active');
+    });
+
+    element.classList.toggle('active');
+
+    if (element.classList.contains('active')) {
+        const reviewContainer = document.getElementById(`review-container-${projectId}`);
+        if (reviewContainer && reviewContainer.innerHTML === "") {
+            reviewContainer.innerHTML = '<p style="font-size:0.8rem; color:var(--primary-color);">Checking for reviews...</p>';
+            
+            try {
+                const reviewsRef = collection(db, "reviews");
+                const q = query(reviewsRef, where("projectId", "==", projectId), where("approved", "==", true));
+                const querySnapshot = await getDocs(q);
+
+                reviewContainer.innerHTML = ""; 
+
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach((doc) => {
+                        const review = doc.data();
+                        const initial = review.author.charAt(0);
+                        
+                        const reviewHtml = `
+                            <div class="review-section">
+                                <h5 style="color:var(--accent-color); margin-bottom:10px;">Client Feedback</h5>
+                                <div class="review-box">
+                                    <i class="fas fa-quote-left"></i>
+                                    <p class="review-text">"${review.text}"</p>
+                                    <div class="review-author">
+                                        <div class="author-avatar">${initial}</div>
+                                        <div class="author-info">
+                                            <h6>${review.author}</h6>
+                                            <span>${review.position}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        reviewContainer.innerHTML += reviewHtml;
+                    });
+                }
+            } catch (error) {
+                console.error("Firebase Review Error:", error);
+                reviewContainer.innerHTML = ""; 
+            }
+        }
     }
 }
 
-// Keep the toggle function as is
-function toggleDetails(element) {
-    // Optional: Check if we are clicking the Link Button. If so, don't toggle the accordion.
-    // However, since the link is inside the details (which are hidden until opened), 
-    // we don't need complex logic here. The click to open happens on the 'summary'.
-    
-    // Logic to close others
-    const allItems = document.querySelectorAll('.project-item');
-    allItems.forEach(item => {
-        if (item !== element) item.classList.remove('active');
-    });
-    element.classList.toggle('active');
+window.onclick = function(event) {
+    if (event.target == modal) closeModal();
 }
 
 
-// --- CONTACT FORM HANDLING (FORMSPREE) ---
-
+// ==========================================
+// 6. CONTACT FORM (FORMSPREE)
+// ==========================================
+// Note: Ensure your HTML contact form uses these IDs
 const contactForm = document.getElementById("contact-form");
+if (contactForm) {
+    contactForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
+        const status = document.getElementById("my-form-status");
+        const btn = document.getElementById("submit-btn");
+        const data = new FormData(event.target);
 
-async function handleSubmit(event) {
-    event.preventDefault(); // Stop page from reloading
+        const originalBtnText = btn.innerHTML;
+        btn.innerHTML = 'Sending... <i class="fas fa-spinner fa-spin"></i>';
+        btn.disabled = true;
 
-    const status = document.getElementById("my-form-status");
-    const btn = document.getElementById("submit-btn");
-    
-    // 1. Get the data from the form
-    const data = new FormData(event.target);
-
-    // Change button text to indicate loading
-    const originalBtnText = btn.innerHTML;
-    btn.innerHTML = 'Sending... <i class="fas fa-spinner fa-spin"></i>';
-    btn.disabled = true;
-
-    // 2. Send to Formspree 
-    fetch("https://formspree.io/f/xwpgqarz", {
-        method: "POST",
-        body: data,
-        headers: {
-            'Accept': 'application/json'
-        }
-    }).then(response => {
-        if (response.ok) {
-            // Success!
-            status.innerHTML = "Thanks! Message received.";
-            status.classList.remove("status-error");
-            status.classList.add("status-success");
-            contactForm.reset(); // Clear the form fields
-        } else {
-            // Error from Formspree
-            response.json().then(data => {
-                if (Object.hasOwn(data, 'errors')) {
-                    status.innerHTML = data["errors"].map(error => error["message"]).join(", ");
-                } else {
-                    status.innerHTML = "Oops! There was a problem submitting your form";
-                }
-                status.classList.remove("status-success");
-                status.classList.add("status-error");
-            });
-        }
-    }).catch(error => {
-        // Network Error
-        status.innerHTML = "Oops! Network error. Please try again.";
-        status.classList.remove("status-success");
-        status.classList.add("status-error");
-    }).finally(() => {
-        // Reset button
-        btn.innerHTML = originalBtnText;
-        btn.disabled = false;
-        
-        // Hide status message after 5 seconds
-        setTimeout(() => {
-            status.classList.remove("status-success", "status-error");
-            status.style.display = 'none';
-        }, 5000);
+        // REPLACE WITH YOUR FORMSPREE URL
+        fetch("https://formspree.io/f/xwpgqarz", {
+            method: "POST",
+            body: data,
+            headers: { 'Accept': 'application/json' }
+        }).then(response => {
+            if (response.ok) {
+                status.innerHTML = "Thanks! Message received.";
+                status.classList.remove("status-error"); status.classList.add("status-success");
+                contactForm.reset();
+            } else {
+                status.innerHTML = "Oops! Error sending message.";
+                status.classList.remove("status-success"); status.classList.add("status-error");
+            }
+        }).catch(error => {
+            status.innerHTML = "Network error.";
+            status.classList.remove("status-success"); status.classList.add("status-error");
+        }).finally(() => {
+            btn.innerHTML = originalBtnText;
+            btn.disabled = false;
+            setTimeout(() => { status.style.display = 'none'; }, 5000);
+        });
     });
 }
 
-contactForm.addEventListener("submit", handleSubmit);
-
-// --- MOBILE MENU INTERACTION ---
-
-// Select elements
+// ==========================================
+// 7. MOBILE MENU LOGIC
+// ==========================================
 const menuToggle = document.getElementById('menu-toggle');
 const navLinks = document.querySelector('.nav-links');
 const menuIcon = document.querySelector('.menu-icon');
 
-// 1. Close menu when clicking a link (Improvement)
-document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', () => {
-        menuToggle.checked = false;
+if (menuToggle) {
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => { menuToggle.checked = false; });
     });
-});
 
-// 2. Close menu when clicking OUTSIDE
-document.addEventListener('click', (e) => {
-    // If the menu is open...
-    if (menuToggle.checked) {
-        // AND the click is NOT on the menu itself
-        // AND the click is NOT on the hamburger icon
-        if (!navLinks.contains(e.target) && !menuIcon.contains(e.target) && e.target !== menuToggle) {
-            menuToggle.checked = false; // Close it
+    document.addEventListener('click', (e) => {
+        if (menuToggle.checked) {
+            if (!navLinks.contains(e.target) && !menuIcon.contains(e.target) && e.target !== menuToggle) {
+                menuToggle.checked = false;
+            }
         }
-    }
-});
+    });
+}
