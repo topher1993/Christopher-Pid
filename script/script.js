@@ -437,7 +437,7 @@ chatToggle.addEventListener('click', window.toggleChat);
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
 // 2. Your API Key (Make sure this is valid!)
-const GEMINI_API_KEY = "AIzaSyBzQIU9GiGcAe4bNMs0ZgW0R5ixriJF9D0"; 
+const GEMINI_API_KEY = "AIzaSyA4NIffuTMLrkTEoSeHfLzBGZMtE4zywWA"; 
 
 const chatForm = document.getElementById('chatForm');
 const userInput = document.getElementById('userInput');
