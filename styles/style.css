@@ -425,8 +425,11 @@ h2 { font-size: clamp(2rem, 4vw, 2.8rem); color: var(--text-main); margin-bottom
 .close-btn:hover { color: white; transform: rotate(90deg); }
 
 .modal-body {
+    flex: 1;           /* Grows to fill the 80vh container */
+    overflow-y: auto;  /* Enables vertical scrolling */
+    min-height: 0;     /* Flexbox bug fix for scrolling */
     padding: 2rem;
-    overflow-y: auto; /* Scrollable */
+    padding-bottom: 4rem; /* Extra space at bottom so last item isn't cut off */
 }
 
 /* --- Project List Items inside Modal --- */
@@ -438,6 +441,8 @@ h2 { font-size: clamp(2rem, 4vw, 2.8rem); color: var(--text-main); margin-bottom
     overflow: hidden;
     transition: 0.3s;
 }
+
+
 
 .project-summary {
     padding: 1.5rem;
@@ -468,10 +473,13 @@ h2 { font-size: clamp(2rem, 4vw, 2.8rem); color: var(--text-main); margin-bottom
     background: rgba(0,0,0,0.2);
 }
 
+
+
 .project-item.active .project-details {
-    max-height: 500px; /* Arbitrary large height */
+    max-height: 2000px; /* Increased from 500px to 2000px */
     padding: 1.5rem;
     border-top: 1px solid var(--border-color);
+    opacity: 1;
 }
 
 .detail-section { margin-bottom: 1rem; }
