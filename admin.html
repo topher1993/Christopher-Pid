@@ -3,25 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Add Project</title>
+    <title>Admin Portal - Christopher Pid</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles/style.css">
     <style>
-        /* Admin-specific styles */
-        body { padding: 4rem; display: block; height: auto; }
-        .admin-container { max-width: 800px; margin: 0 auto; background: rgba(15, 23, 42, 0.9); padding: 2rem; border-radius: 15px; border: 1px solid var(--border-color); }
-        h1 { margin-bottom: 2rem; text-align: center; color: var(--primary-color); }
+        body { padding: 2rem; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        /* Default: Hide the actual admin panel */
+        #admin-panel { display: none; width: 100%; max-width: 800px; }
+        
+        /* Login Overlay Styles */
+        #login-overlay { text-align: center; background: rgba(15, 23, 42, 0.95); padding: 3rem; border-radius: 20px; border: 1px solid var(--border-color); }
         .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .note { font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem; }
+        
+        /* Status Bar */
+        .auth-bar {
+            position: absolute; top: 20px; right: 20px; 
+            font-size: 0.9rem; color: var(--text-light);
+        }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
+    <div id="login-overlay">
+        <h2><i class="fas fa-shield-alt"></i> Protected Area</h2>
+        <p style="margin-bottom: 2rem; color: #94a3b8;">This portal is restricted to the site owner.</p>
+        <button id="login-btn" class="btn btn-primary">
+            Sign in with Google <i class="fab fa-google"></i>
+        </button>
+        <p id="auth-error" style="color: #f87171; margin-top: 1rem; font-size: 0.9rem;"></p>
+    </div>
+
+    <div class="admin-container" id="admin-panel">
+        <div class="auth-bar">
+            Logged in as: <span id="user-display" style="color:white;"></span> 
+            <button id="logout-btn" style="background:none; border:none; color:#f87171; cursor:pointer; margin-left:10px;">(Logout)</button>
+        </div>
+
         <h1><i class="fas fa-database"></i> Add New Project</h1>
         
         <form id="project-form">
-            <!-- 1. Category & ID -->
             <div class="row">
                 <div class="form-group">
                     <label>Category</label>
@@ -34,11 +56,10 @@
                 <div class="form-group">
                     <label>Project ID (Slug)</label>
                     <input type="text" id="slug" class="form-control" placeholder="e.g. chtr-clothing" required>
-                    <p class="note">No spaces. Used for DB identification.</p>
+                    <p class="note" style="font-size: 0.8rem; color: #94a3b8;">No spaces.</p>
                 </div>
             </div>
 
-            <!-- 2. Basic Info -->
             <div class="row">
                 <div class="form-group">
                     <label>Project Title</label>
@@ -53,19 +74,17 @@
                 </div>
             </div>
 
-            <!-- 3. Labels -->
             <div class="row">
                 <div class="form-group">
-                    <label>Type (Paid/Personal)</label>
+                    <label>Type</label>
                     <input type="text" id="type" class="form-control" placeholder="Paid Project" required>
                 </div>
                 <div class="form-group">
-                    <label>Role (Solo/Collab)</label>
+                    <label>Role</label>
                     <input type="text" id="roleType" class="form-control" placeholder="Full Stack (Solo)" required>
                 </div>
             </div>
 
-            <!-- 4. Details -->
             <div class="form-group">
                 <label>Description</label>
                 <textarea id="desc" class="form-control" rows="3" required></textarea>
@@ -76,11 +95,10 @@
                 <textarea id="thoughts" class="form-control" rows="2" required></textarea>
             </div>
 
-            <!-- 5. Tech & Links -->
             <div class="row">
                 <div class="form-group">
                     <label>Tech Stack (Comma separated)</label>
-                    <input type="text" id="tech" class="form-control" placeholder="React, Firebase, CSS" required>
+                    <input type="text" id="tech" class="form-control" placeholder="React, Firebase" required>
                 </div>
                 <div class="form-group">
                     <label>External Link URL</label>
@@ -96,23 +114,65 @@
     </div>
 
     <script type="module">
-        import { db } from './script/firebase-config.js';
+        // 1. Import new Auth tools
+        import { db, auth, provider } from './script/firebase-config.js';
         import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+        const loginOverlay = document.getElementById('login-overlay');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const authError = document.getElementById('auth-error');
+
+        // --- SECURITY CHECK ---
+        // REPLACE THIS with your actual Google Email
+        const AUTHORIZED_EMAIL = "swtopherpid09@gmail.com"; 
+
+        // 2. Listen for Auth State
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (user.email === AUTHORIZED_EMAIL) {
+                    // Success: Show Admin
+                    loginOverlay.style.display = "none";
+                    adminPanel.style.display = "block";
+                    document.getElementById('user-display').innerText = user.email;
+                } else {
+                    // Fail: Wrong Email
+                    authError.innerText = "Access Denied: " + user.email + " is not authorized.";
+                    signOut(auth); // Kick them out immediately
+                }
+            } else {
+                // No User: Show Login
+                loginOverlay.style.display = "block";
+                adminPanel.style.display = "none";
+            }
+        });
+
+        // 3. Login Action
+        loginBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider).catch((error) => {
+                authError.innerText = error.message;
+            });
+        });
+
+        // 4. Logout Action
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth);
+        });
+
+        // 5. Form Submission (Unchanged logic, just secured)
         document.getElementById('project-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const btn = document.getElementById('save-btn');
             const status = document.getElementById('admin-status');
             const slug = document.getElementById('slug').value.trim();
+            
+            btn.innerHTML = 'Uploading...'; btn.disabled = true;
 
-            btn.innerHTML = 'Uploading...';
-            btn.disabled = true;
-
-            // Prepare Data
             const projectData = {
                 id: slug,
-                category: document.getElementById('cat').value, // 'design' or 'dev'
+                category: document.getElementById('cat').value,
                 title: document.getElementById('title').value,
                 status: document.getElementById('status').value,
                 type: document.getElementById('type').value,
@@ -120,15 +180,12 @@
                 desc: document.getElementById('desc').value,
                 thoughts: document.getElementById('thoughts').value,
                 link: document.getElementById('link').value,
-                // Split string by comma to create an Array
                 tech: document.getElementById('tech').value.split(',').map(item => item.trim()), 
                 createdAt: serverTimestamp()
             };
 
             try {
-                // Use setDoc to define our own custom ID (the slug) instead of a random ID
                 await setDoc(doc(db, "projects", slug), projectData);
-                
                 status.innerText = "Success! Project added.";
                 status.style.color = "#4ade80";
                 document.getElementById('project-form').reset();

@@ -427,16 +427,15 @@ window.toggleChat = function() {
 }
 
 chatToggle.addEventListener('click', window.toggleChat);
-
-
 // ==========================================
-// 9. AI CHATBOT LOGIC (VIA GOOGLE SDK)
+// 9. AI CHATBOT LOGIC (DYNAMIC BRAIN)
 // ==========================================
 
-// 1. Import the Google SDK directly from the web
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+// Added 'doc' and 'getDoc' to imports
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; 
 
-// 2. Your API Key (Make sure this is valid!)
+// 🚨 SECURITY NOTE: Ideally, move this to a backend environment variable!
 const GEMINI_API_KEY = "AIzaSyA4NIffuTMLrkTEoSeHfLzBGZMtE4zywWA"; 
 
 const chatForm = document.getElementById('chatForm');
@@ -444,79 +443,54 @@ const userInput = document.getElementById('userInput');
 const chatMessages = document.getElementById('chatMessages');
 const typingIndicator = document.getElementById('typingIndicator');
 
-// 3. Define the Knowledge Base (System Instruction)
-// We combine your Resume Info + The Dynamic Projects List
-const staticContext = `
-You are the AI Digital Assistant for Christopher Pid Ready to answer based on his CORE IDENTITIES , Professional PHILOSOPHY, WORK HISTORY,TECHNICAL SKILLSET. 
-Your persona is professional, enthusiastic, and technically knowledgeable. 
-You represent a "Hybrid" professional who bridges the gap between Physical Product Design and Digital Engineering.
+// CACHE: Store profile data here so we don't fetch it on every single message
+let cachedProfileData = null;
 
---- CORE IDENTITY ---
-Name: Christopher Javier Pid
-Birthdate: November 9, 1993
-BirthPlace: San Francisco Bulan, Sorsogon
-Educational Background: 
-    -tertiary education: Asian institute of computer studies
-    -associate in computer science
-    -school year: 2010-2012
-Training attended: 
-    -Community Extension Services offered by Adventist University of the Philippines
-    -short courses: MEG Welding
-                    Computer Graphics
-                    Computer Technology
-                    Automotive 
-    -year attended: 2009-2010
-Location: Tokyo, Japan
-Languages: English (Professional/Fluent), Japanese (JLPT N4 - Conversational), Tagalog (Native).
-Experience: 10+ years in Automotive & Manufacturing sectors.
-Education: Associate in Computer Science (Asian Institute of Computer Studies, 2012).
+async function getSystemContext() {
+    // 1. If we already have the data, return it (Save reads)
+    if (cachedProfileData) return cachedProfileData;
 
---- PROFESSIONAL PHILOSOPHY ---
-Christopher's main value proposition is "Bridging the Gap." 
-He doesn't just design parts; he writes software to automate the design process.
-He combines Industrial Design (Surface Modeling, Aesthetics) with Full-Stack Development (Automation, Web Apps, IoT).
+    try {
+        // 2. Fetch from Firestore (Single Source of Truth)
+        console.log("Fetching AI Brain from Database...");
+        const docRef = doc(db, "profile", "main");
+        const docSnap = await getDoc(docRef);
 
---- WORK HISTORY ---
-1. CURRENT: CATIA V5 Specialist at Planex Engineering (May 2024 - Present).
-   - Focus: Complex surface modeling for automotive parts.
-   - Key Achievement: creating parametric Part Templates to speed up workflow.
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            // Format it back into a string prompt
+            cachedProfileData = `
+            You are the AI Assistant for Christopher Pid.
+            --- CORE IDENTITY ---
+            ${data.identity}
+            --- PHILOSOPHY ---
+            ${data.philosophy}
+            --- WORK HISTORY ---
+            ${data.history}
+            --- TECHNICAL SKILLS ---
+            ${data.skills}
+            --- INSTRUCTIONS ---
+            ${data.instructions}
+            `;
+        } else {
+            console.warn("No profile data found in DB. Using fallback.");
+            cachedProfileData = "You are a helpful assistant for Christopher Pid.";
+        }
+    } catch (error) {
+        console.error("Error fetching profile:", error);
+        cachedProfileData = "You are a helpful assistant.";
+    }
+    return cachedProfileData;
+}
 
-2. PREVIOUS: CAD/CAM Specialist at Planex Technology Inc (Japan HQ, 2019-2024).
-   - Achievement: Selected for international transfer from Philippines to Japan HQ due to performance.
-   - Role: Technical bridge between offshore teams and Japanese management.
-
-3. PREVIOUS: CAD/CAM Operator at Planex Technology Inc (Philippines, 2015-2019).
-   - Focus: End-to-end product lifecycles for major enterprise accounts.
-
---- TECHNICAL SKILLSET ---
-A. Industrial Design:
-   - Expert: CATIA V5 (Generative Shape Design - GSD), Part Design.
-   - Proficient: SolidWorks, ThinkDesign, AutoCAD, Cimatron.
-   - Domain Knowledge: GD&T, Manufacturing Constraints, Class-A Surfacing.
-
-B. Software Development:
-   - Frontend: HTML5, CSS3, JavaScript (ES6+), React.js, Tailwind.
-   - Backend/Data: Node.js, Python (Pandas/Automation), Firebase (Firestore/Auth), SQL.
-   - Hardware/IoT: ESP32 Microcontrollers, C++, WebSockets, Face-api.js.
-   - Tools: Git, n8n (Workflow Automation).
-
---- BEHAVIORAL INSTRUCTIONS ---
-1. If asked about "Contact": Provide the email 'swtopherpid09@gmail.com' and suggest using the form on the website.
-2. If asked about "Availability": Mention he is open to collaborative projects and consulting.
-3. If asked about a specific project: Refer to the JSON data provided below. Explain the "Tech Stack" used and the "Key Thought" behind it.
-4. If you don't know the answer: Say, "I'm not sure about that specific detail, but I can tell you that Christopher loves learning new technologies. You should message him directly!"
-5. Keep answers concise (under 4 sentences) unless the user asks for a detailed explanation.
-`;
-// Helper: Add message to UI
 function appendMessage(text, sender) {
     const div = document.createElement('div');
     div.classList.add('message', sender === 'user' ? 'user-msg' : 'bot-msg');
-    div.innerHTML = text.replace(/\n/g, '<br>'); // Format line breaks
+    div.innerHTML = text.replace(/\n/g, '<br>'); 
     chatMessages.appendChild(div);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// 4. Handle Chat Submission
 if (chatForm) {
     chatForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -528,25 +502,43 @@ if (chatForm) {
         typingIndicator.style.display = 'block';
 
         try {
+            // 1. Initialize AI (Make sure model is 'gemini-2.5-flash')
             const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
             const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-            // Combine Static Knowledge + Live Database Projects
-            const projectContext = JSON.stringify(projectsData);
+            // 2. Build The "Sales" Context
+            const dynamicProfile = await getSystemContext();
+            const projectContext = JSON.stringify(projectsData); 
             
+            // --- THE UPGRADE: SALES-ORIENTED SYSTEM PROMPT ---
             const prompt = `
-            ${staticContext}
+            You are the "Business Development AI" for Christopher Pid. 
+            Your Goal: Impress potential clients and recruiters to get Christopher hired.
             
-            --- CURRENT PORTFOLIO PROJECTS (Live Database) ---
-            Below is a JSON list of his actual work. Use this to answer questions about what he has built.
+            --- YOUR PERSONA ---
+            1.  **Professional & Enthusiastic:** You are confident but polite.
+            2.  **The "Hybrid" Pitch:** Always look for opportunities to mention that Christopher is rare because he bridges "Physical Manufacturing" (CATIA/CAD) and "Digital Automation" (Coding/IoT). This saves companies time and money.
+            3.  **Concise:** Keep answers under 4-5 sentences unless asked for details. Use bullet points for readability.
+            
+            --- YOUR KNOWLEDGE BASE ---
+            ${dynamicProfile}
+            
+            --- HIS PORTFOLIO (Real-time Data) ---
             ${projectContext}
+            
+            --- CONVERSATION RULES ---
+            1.  **If asked about skills:** Don't just list them. Explain *value*. (e.g., "He doesn't just know Python; he uses it to automate CAD workflows.")
+            2.  **If asked about availability:** "He is currently open to new opportunities! You should definitely message him."
+            3.  **If asked "Why should I hire him?":** Emphasize his ability to solve complex engineering problems with custom software tools.
+            4.  **Call to Action:** Occasionally end your response with a question like: "Would you like to know more about his automation work?" or "Shall I give you his direct email?"
             
             --- USER QUESTION ---
             "${text}"
             
-            Answer as Christopher's AI Assistant:
+            Answer now as his Business Development AI:
             `;
 
+            // 3. Generate
             const result = await model.generateContent(prompt);
             const response = await result.response;
             const answer = response.text();
@@ -557,7 +549,7 @@ if (chatForm) {
         } catch (error) {
             console.error("AI Error:", error);
             typingIndicator.style.display = 'none';
-            appendMessage("I'm having trouble connecting to my brain. Please try again later.", 'bot');
+            appendMessage("My brain is currently engaging in deep thought (Network Error). Please try again or email Christopher directly!", 'bot');
         }
     });
 }

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Migrate Profile Data</title>
+    <style>
+        body { font-family: sans-serif; padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f1f5f9; }
+        button { padding: 1rem 2rem; cursor: pointer; font-size: 1rem; border-radius: 5px; border: none; margin: 10px; }
+        .btn-login { background: #3b82f6; color: white; }
+        .btn-migrate { background: #10b981; color: white; display: none; } /* Hidden by default */
+        #status { margin-top: 1rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>System Migration</h1>
+    <p>Please sign in to prove you are the owner.</p>
+
+    <button id="login-btn" class="btn-login">1. Sign In with Google</button>
+    <button id="migrate-btn" class="btn-migrate">2. Upload Resume Data to DB</button>
+    
+    <p id="status"></p>
+
+    <script type="module">
+        import { db, auth, provider } from './script/firebase-config.js';
+        import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const loginBtn = document.getElementById('login-btn');
+        const migrateBtn = document.getElementById('migrate-btn');
+        const status = document.getElementById('status');
+
+        // 1. Handle Login
+        loginBtn.addEventListener('click', async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                status.innerText = "Logged in as: " + result.user.email;
+                status.style.color = "#3b82f6";
+                // Show the migrate button now that we are logged in
+                migrateBtn.style.display = "block";
+                loginBtn.style.display = "none";
+            } catch (error) {
+                status.innerText = "Login Failed: " + error.message;
+                status.style.color = "red";
+            }
+        });
+
+        // 2. Data to Upload
+        const profileData = {
+            identity: `Name: Christopher Javier Pid
+Birthdate: November 9, 1993
+Location: Tokyo, Japan
+Languages: English (Professional), Japanese (JLPT N4), Tagalog (Native).
+Experience: 10+ years in Automotive & Manufacturing.`,
+            
+            philosophy: `Christopher's main value proposition is "Bridging the Gap." 
+He combines Industrial Design (Surface Modeling) with Full-Stack Development (Automation, IoT).`,
+
+            history: `1. CURRENT: CATIA V5 Specialist at Planex Engineering (May 2024 - Present). Focus: Complex surface modeling, parametric templates.
+2. PREVIOUS: CAD/CAM Specialist at Planex Technology Inc (Japan HQ, 2019-2024). Selected for international transfer.
+3. PREVIOUS: CAD/CAM Operator at Planex Technology Inc (Philippines, 2015-2019).`,
+
+            skills: `A. Industrial Design: CATIA V5 (GSD, Part Design), SolidWorks, GD&T, Class-A Surfacing.
+B. Software Development: HTML/CSS/JS, React, Node.js, Python, Firebase, SQL.
+C. Hardware/IoT: ESP32, C++, WebSockets.`,
+
+            instructions: `1. If asked about "Contact": Provide 'swtopherpid09@gmail.com'.
+2. If asked about "Availability": Mention he is open to collaborative projects.
+3. If don't know: Say "I'm not sure, but Christopher loves learning new tech!"`
+        };
+
+        // 3. Handle Migration
+        migrateBtn.addEventListener('click', async () => {
+            status.innerText = "Uploading...";
+            try {
+                await setDoc(doc(db, "profile", "main"), profileData);
+                status.innerText = "Success! Data is now in Firestore. You can delete this file.";
+                status.style.color = "green";
+            } catch (e) {
+                console.error(e);
+                status.innerText = "Error: " + e.message;
+                status.style.color = "red";
+            }
+        });
+    </script>
+</body>
+</html>

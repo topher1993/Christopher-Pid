@@ -4,6 +4,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import { getAuth , GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyD2PKfscSYM6qVz_mmZ9jCxt9X_Xtm4e8g",
@@ -18,5 +19,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Export 'db' so other files can use it
-export { db };
+const auth = getAuth();
+const provider = new GoogleAuthProvider();
+
+
+// Export
+export { db, auth, provider  };
