@@ -435,8 +435,8 @@ import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 // Added 'doc' and 'getDoc' to imports
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; 
 
-// 🚨 SECURITY NOTE: Ideally, move this to a backend environment variable!
-const GEMINI_API_KEY = "AIzaSyA4NIffuTMLrkTEoSeHfLzBGZMtE4zywWA"; 
+// Gemini calls must go through a backend/proxy. Do not expose API keys in browser code.
+const GEMINI_API_KEY = null;
 
 const chatForm = document.getElementById('chatForm');
 const userInput = document.getElementById('userInput');
@@ -502,6 +502,12 @@ if (chatForm) {
         typingIndicator.style.display = 'block';
 
         try {
+            if (!GEMINI_API_KEY) {
+                typingIndicator.style.display = 'none';
+                appendMessage("The AI chat is temporarily disabled while Christopher moves it to a secure backend.", 'bot');
+                return;
+            }
+
             // 1. Initialize AI (Make sure model is 'gemini-2.5-flash')
             const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
             const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
