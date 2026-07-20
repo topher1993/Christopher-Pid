@@ -1,266 +1,304 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Christopher Pid | Product Designer & Full-Stack Developer</title>
-    <meta name="description" content="A hybrid engineer bridging physical design (CATIA V5) and digital automation (React, Python, IoT). Solving manufacturing problems with custom software.">
-    <meta name="keywords" content="Christopher Pid, Product Design, CATIA V5, Full Stack Developer, Industrial Design, Automation, Tokyo, Portfolio">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Christopher Pid | Product Designer & Software Builder</title>
+    <meta name="description" content="Tokyo-based product designer and software builder combining 10+ years of manufacturing experience with React, Python, automation, and AI-enabled applications.">
     <meta name="author" content="Christopher Pid">
-    <meta name="theme-color" content="#020617"> <meta property="og:type" content="website">
+    <meta name="theme-color" content="#0a0d0c">
+    <meta name="christopher-ai-endpoint" content="https://christopher-ai-minimax.swtopherpid09.workers.dev/api/chat">
+    <meta property="og:type" content="website">
     <meta property="og:url" content="https://christopher-portfolio93.web.app/">
-    <meta property="og:title" content="Christopher Pid | The Hybrid Engineer">
-    <meta property="og:description" content="Bridging the gap between Physical Product Design and Digital Engineering. View my 3D Modeling and Full-Stack Automation projects.">
+    <meta property="og:title" content="Christopher Pid | From physical products to useful software">
+    <meta property="og:description" content="Selected work across CATIA V5, manufacturing automation, mobile learning, and AI-enabled web applications.">
     <meta property="og:image" content="https://christopher-portfolio93.web.app/images/1759986216750.jpg">
-
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://christopher-portfolio93.web.app/">
-    <meta property="twitter:title" content="Christopher Pid | Product Designer & Developer">
-    <meta property="twitter:description" content="I don't just design parts; I write the software to automate the process. See my hybrid portfolio.">
-    <meta property="twitter:image" content="https://christopher-portfolio93.web.app/images/1759986216750.jpg">
-
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" type="image/png" href="./images/favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="./styles/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/style.css?v=20260720-persona">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Christopher Pid",
+      "url": "https://christopher-portfolio93.web.app/",
+      "sameAs": [
+        "https://github.com/topher1993",
+        "https://www.linkedin.com/in/christopher-j-pid-078953212/"
+      ],
+      "jobTitle": "Product Designer and Software Developer",
+      "address": { "@type": "PostalAddress", "addressLocality": "Tokyo", "addressCountry": "Japan" }
+    }
+    </script>
 </head>
 <body>
+    <a class="skip-link" href="#main">Skip to content</a>
 
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-container">
-           <!-- Updated Logo Image -->
-        <a href="#" class="logo-link">
-            <img src="images/logo.png" alt="Christopher Pid Logo" class="logo-img">
-        </a>
-            <input type="checkbox" id="menu-toggle" class="menu-toggle">
-            <label for="menu-toggle" class="menu-icon"><i class="fas fa-bars"></i></label>
-            <div class="nav-links">
+    <header class="site-header">
+        <nav class="nav-shell" aria-label="Primary navigation">
+            <a class="wordmark" href="#top" aria-label="Christopher Pid, home">
+                <span class="wordmark-logo"><img src="./images/logo.png" alt="" width="500" height="500"></span>
+                <span class="wordmark-name">Christopher Pid</span>
+            </a>
+            <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-menu">
+                <span class="sr-only">Toggle menu</span>
+                <span></span><span></span>
+            </button>
+            <div class="nav-links" id="site-menu">
+                <a href="#work">Work</a>
+                <a href="#capabilities">Capabilities</a>
                 <a href="#about">About</a>
-                <a href="#personal-info">Stats</a>
-                <a href="#skills">Expertise</a>
-                <a href="#projects">Work</a>
                 <a href="#contact">Contact</a>
-                <a href="cv-template.html" class="nav-btn" >
-                Resume <i class="fas fa-download"></i>
-                </a>
+                <a class="nav-resume" href="cv-template.html">Resume <span aria-hidden="true">↗</span></a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main">
+        <section class="hero" id="top" aria-labelledby="hero-title">
+            <canvas class="knowledge-constellation" id="knowledgeConstellation" aria-hidden="true"></canvas>
+            <div class="hero-grid">
+                <div class="hero-copy reveal">
+                    <p class="eyebrow"><span></span> Tokyo, Japan · Hybrid engineering</p>
+                    <h1 id="hero-title">I turn manufacturing problems into <em>useful software.</em></h1>
+                    <p class="hero-intro">I’m Christopher—a product designer and developer combining deep CAD and manufacturing experience with automation, mobile apps, and AI-enabled tools.</p>
+                    <div class="hero-actions">
+                        <a class="button button-primary" href="#work">Explore selected work <span aria-hidden="true">↓</span></a>
+                        <a class="text-link" href="https://github.com/topher1993" target="_blank" rel="noreferrer">GitHub profile <span aria-hidden="true">↗</span></a>
+                    </div>
+                </div>
+
+                <aside class="hero-panel reveal" aria-label="Christopher Pid, professional summary">
+                    <div class="hero-identity">
+                        <img src="./images/1759986216750.jpg" alt="Portrait of Christopher Pid" width="640" height="640">
+                        <div>
+                            <p class="identity-name">Christopher Pid</p>
+                            <p class="identity-role">Product designer + software builder</p>
+                        </div>
+                    </div>
+                    <p class="panel-label">What I bring</p>
+                    <div class="hero-stat">
+                        <strong>10+</strong>
+                        <span>years across CAD, CAM, and product design</span>
+                    </div>
+                    <div class="hero-stat">
+                        <strong>2×</strong>
+                        <span>perspective: physical manufacturing + digital products</span>
+                    </div>
+                    <div class="signal-row">
+                        <span>CATIA V5</span><span>React</span><span>Python</span><span>TypeScript</span>
+                    </div>
+                </aside>
+            </div>
+            <div class="hero-marquee" aria-hidden="true">
+                <span>PRODUCT DESIGN</span><i>◆</i><span>SOFTWARE ENGINEERING</span><i>◆</i><span>AUTOMATION</span><i>◆</i><span>AI TOOLS</span>
+            </div>
+        </section>
+
+        <section class="section work-section" id="work" aria-labelledby="work-title">
+            <div class="section-heading reveal">
+                <div>
+                    <p class="eyebrow">01 / Selected work</p>
+                    <h2 id="work-title">Projects with a job to do.</h2>
+                </div>
+                <p>Recent builds that connect product thinking, practical engineering, and dependable implementation.</p>
+            </div>
+
+            <div class="projects-grid">
+                <article class="project-card project-featured project-japanese reveal">
+                    <div class="project-topline">
+                        <span class="project-number">01</span>
+                        <span class="project-status">Active build</span>
+                    </div>
+                    <div class="project-content">
+                        <p class="project-kicker">Mobile learning · Product engineering</p>
+                        <h3>Japanese Tutor</h3>
+                        <p>An Expo and React Native learning app designed around structured lessons, quiz grading, progress tracking, and an offline-ready data foundation.</p>
+                        <ul class="project-proof" aria-label="Project highlights">
+                            <li>SQLite-ready learning architecture</li>
+                            <li>Progress and streak services</li>
+                            <li>TypeScript test coverage</li>
+                        </ul>
+                        <div class="tech-list"><span>React Native</span><span>Expo</span><span>TypeScript</span><span>SQLite</span></div>
+                    </div>
+                    <a class="project-link" href="https://github.com/topher1993/japanese-tutor" target="_blank" rel="noreferrer" aria-label="View Japanese Tutor source code on GitHub">View repository <span aria-hidden="true">↗</span></a>
+                </article>
+
+                <article class="project-card project-featured project-stronghold reveal">
+                    <div class="project-topline">
+                        <span class="project-number">02</span>
+                        <span class="project-status">Deployed</span>
+                    </div>
+                    <div class="project-content">
+                        <p class="project-kicker">Agent operations · Secure workflow design</p>
+                        <h3>Agent Army Stronghold</h3>
+                        <p>A guarded mission-control dashboard for coordinating AI-agent work, with explicit approval gates and a deliberately narrow security boundary.</p>
+                        <ul class="project-proof" aria-label="Project highlights">
+                            <li>Approval-gated task flows</li>
+                            <li>Local-first security posture</li>
+                            <li>Automated checks and GitHub Pages</li>
+                        </ul>
+                        <div class="tech-list"><span>React</span><span>TypeScript</span><span>Vite</span><span>Vitest</span></div>
+                    </div>
+                    <a class="project-link" href="https://github.com/topher1993/Agent-Army-stronghold" target="_blank" rel="noreferrer" aria-label="View Agent Army Stronghold source code on GitHub">View repository <span aria-hidden="true">↗</span></a>
+                </article>
+
+                <article class="project-card project-compact reveal">
+                    <div class="project-topline">
+                        <span class="project-number">03</span>
+                        <span class="project-status">Full stack</span>
+                    </div>
+                    <div class="project-content">
+                        <p class="project-kicker">AI extraction · Fintech utility</p>
+                        <h3>QuickScan Pay</h3>
+                        <p>Turns payment screenshots into structured scan records through an AI-assisted extraction flow and a lightweight storage API.</p>
+                        <div class="tech-list"><span>React</span><span>Gemini</span><span>Express</span><span>SQLite</span></div>
+                    </div>
+                    <a class="project-link" href="https://github.com/topher1993/QuickScan" target="_blank" rel="noreferrer" aria-label="View QuickScan Pay source code on GitHub">View repository <span aria-hidden="true">↗</span></a>
+                </article>
+
+                <article class="project-card project-compact project-cad reveal">
+                    <div class="project-topline">
+                        <span class="project-number">04</span>
+                        <span class="project-status">Professional work</span>
+                    </div>
+                    <div class="project-content">
+                        <p class="project-kicker">CAD systems · Manufacturing automation</p>
+                        <h3>Parametric CAD Workflows</h3>
+                        <p>Reusable CATIA V5 Part Templates, PowerCopies, and scripting workflows created to reduce repetitive modeling and standardize engineering output.</p>
+                        <div class="tech-list"><span>CATIA V5</span><span>GSD</span><span>Python</span><span>CAD/CAM</span></div>
+                    </div>
+                    <a class="project-link" href="cv-template.html" aria-label="Read more about Christopher's CAD experience in his resume">Experience details <span aria-hidden="true">↗</span></a>
+                </article>
+            </div>
+
+            <div class="all-work reveal">
+                <p>More experiments and active builds live on GitHub.</p>
+                <a class="button button-secondary" href="https://github.com/topher1993?tab=repositories" target="_blank" rel="noreferrer">Browse all repositories <span aria-hidden="true">↗</span></a>
+            </div>
+        </section>
+
+        <section class="section capabilities-section" id="capabilities" aria-labelledby="capabilities-title">
+            <div class="section-heading reveal">
+                <div>
+                    <p class="eyebrow">02 / Capabilities</p>
+                    <h2 id="capabilities-title">One builder, three connected disciplines.</h2>
+                </div>
+            </div>
+            <div class="capability-grid">
+                <article class="capability reveal">
+                    <span class="capability-index">A</span>
+                    <h3>Product & CAD</h3>
+                    <p>Complex surface modeling, parametric design, assemblies, drafting, and design-for-manufacturing grounded in real production constraints.</p>
+                    <p class="capability-tools">CATIA V5 · GSD · SolidWorks · GD&amp;T</p>
+                </article>
+                <article class="capability reveal">
+                    <span class="capability-index">B</span>
+                    <h3>Software products</h3>
+                    <p>Responsive web and mobile experiences backed by clear data models, practical APIs, testing, and maintainable TypeScript.</p>
+                    <p class="capability-tools">React · React Native · Node.js · SQL</p>
+                </article>
+                <article class="capability reveal">
+                    <span class="capability-index">C</span>
+                    <h3>Automation & AI</h3>
+                    <p>Workflow automation and focused AI integrations that remove repetitive work without hiding operational or security tradeoffs.</p>
+                    <p class="capability-tools">Python · LLM APIs · IoT · n8n</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section about-section" id="about" aria-labelledby="about-title">
+            <div class="portrait-wrap reveal">
+                <img src="./images/1759986216750.jpg" alt="Christopher Pid" width="640" height="640">
+                <span class="portrait-note">Based in Tokyo<br>Working across physical + digital</span>
+            </div>
+            <div class="about-copy reveal">
+                <p class="eyebrow">03 / About</p>
+                <h2 id="about-title">Engineering experience, translated into better products.</h2>
+                <p class="about-lead">My career started in CAD/CAM and product design. Software became the natural next tool: a way to automate the repetitive parts, connect disconnected workflows, and turn specialist knowledge into products other people can use.</p>
+                <p>I bring over a decade of manufacturing context, experience working between Philippine and Japanese engineering teams, and a builder’s habit of taking ideas all the way to a working interface.</p>
+                <div class="about-actions">
+                    <a class="button button-primary" href="cv-template.html">Read my resume <span aria-hidden="true">↗</span></a>
+                    <a class="text-link" href="https://www.linkedin.com/in/christopher-j-pid-078953212/" target="_blank" rel="noreferrer">LinkedIn <span aria-hidden="true">↗</span></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact-section" id="contact" aria-labelledby="contact-title">
+            <div class="contact-inner">
+                <div class="contact-copy reveal">
+                    <p class="eyebrow">04 / Contact</p>
+                    <h2 id="contact-title">Have a difficult problem that crosses disciplines?</h2>
+                    <p>Tell me what you’re building, what is slowing the team down, and what a useful outcome looks like.</p>
+                    <a class="email-link" href="mailto:swtopherpid09@gmail.com">swtopherpid09@gmail.com <span aria-hidden="true">↗</span></a>
+                </div>
+                <form class="contact-form reveal" id="contact-form">
+                    <div class="field-row">
+                        <label for="name">Name</label>
+                        <input id="name" name="name" type="text" autocomplete="name" required>
+                    </div>
+                    <div class="field-row">
+                        <label for="email">Email</label>
+                        <input id="email" name="email" type="email" autocomplete="email" required>
+                    </div>
+                    <div class="field-row">
+                        <label for="message">What can I help with?</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+                    <button class="button button-primary form-submit" type="submit">Send message <span aria-hidden="true">→</span></button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>© <span id="year">2026</span> Christopher Pid</p>
+        <p>Product design <i>×</i> software engineering</p>
+        <a href="#top">Back to top ↑</a>
+    </footer>
+
+    <button class="persona-toggle" id="persona-toggle" type="button" aria-label="Ask Christopher AI" aria-expanded="false" aria-controls="persona-panel">
+        <span class="persona-toggle-status" aria-hidden="true"></span>
+        <span class="persona-toggle-label">Ask Christopher AI</span>
+        <span class="persona-toggle-mark" aria-hidden="true">AI</span>
+    </button>
+
+    <aside class="persona-panel" id="persona-panel" aria-label="Christopher AI portfolio assistant" aria-hidden="true">
+        <header class="persona-header">
+            <div class="persona-heading">
+                <img src="./images/1759986216750.jpg" alt="" width="96" height="96">
+                <div>
+                    <h2>Christopher AI</h2>
+                    <p><span aria-hidden="true"></span> Online · Portfolio knowledge</p>
+                </div>
+            </div>
+            <button class="persona-close" id="persona-close" type="button" aria-label="Close Christopher AI">×</button>
+        </header>
+
+        <div class="persona-messages" id="persona-messages" aria-live="polite">
+            <div class="persona-message persona-message-ai">
+                Hi, I’m Christopher’s online persona. Ask me about his CAD experience, software projects, automation work, or why his physical + digital background is useful.
+            </div>
+            <div class="persona-prompts" id="persona-prompts" aria-label="Suggested questions">
+                <button type="button" data-persona-question="Why should I hire Christopher?">Why hire Christopher?</button>
+                <button type="button" data-persona-question="Tell me about his latest projects.">Latest projects</button>
+                <button type="button" data-persona-question="What is his CATIA experience?">CATIA experience</button>
             </div>
         </div>
-    </nav>
 
-    <!-- 1. About Me (Hero) -->
-    <section id="about">
-        <canvas id="heroCanvas" class="bg-canvas"></canvas>
-        <div class="about-content-wrapper reveal">
-            <img src="./images/1759986216750.jpg  " alt="Profile" class="profile-img">
-            <div class="about-text">
-                <h1>Hi, I'm <span>Christopher</span></h1>
-                <p>
-                    Bridging the gap between <strong>Physical Product Design</strong> and <strong>Digital Engineering</strong>. 
-                    Specializing in CATIA V5 Surface Modeling and Full-Stack Development.
-                </p>
-                <a href="#projects" class="btn btn-primary">View Work <i class="fas fa-arrow-down"></i></a>
-                <a href="#contact" class="btn btn-outline">Contact Me</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- 2. Personal Info -->
-    <section id="personal-info">
-        <div class="info-grid reveal">
-            <div class="info-card">
-                <div class="info-icon"><i class="fas fa-hourglass-half"></i></div>
-                <h3>Experience</h3><p>10 yrs+</p>
-            </div>
-            <div class="info-card">
-                <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
-                <h3>Location</h3><p>Tokyo, Japan</p>
-            </div>
-            <div class="info-card">
-                <div class="info-icon"><i class="fas fa-briefcase"></i></div>
-                <h3>Role</h3><p>Product Designer</p>
-            </div>
-            <div class="info-card">
-                <div class="info-icon"><i class="fas fa-envelope"></i></div>
-                <h3>Email</h3><p>swtopherpid09@gmail.com</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- 3. Skills -->
-    <section id="skills">
-        <h2 class="reveal">Skills & <span style="color:var(--accent-color)">Expertise</span></h2>
-        
-        <div class="skills-wrapper reveal">
-            <div class="skill-category cat-design">
-                <canvas id="designCanvas" class="card-canvas"></canvas>
-                <div class="category-header">
-                    <i class="fas fa-pen-nib"></i>
-                    <h3 class="category-title">Industrial Design</h3>
-                </div>
-                <div class="skills-list">
-                    <div class="skill-tag"><i class="fas fa-cube"></i> CATIA V5</div>
-                    <div class="skill-tag"><i class="fas fa-bezier-curve"></i> Surface (GSD)</div>
-                    <div class="skill-tag"><i class="fas fa-layer-group"></i> SolidWorks</div>
-                    <div class="skill-tag"><i class="fas fa-compass-drafting"></i> Drafting</div>
-                    <div class="skill-tag"><i class="fas fa-gear"></i> Part Design</div>
-                    <div class="skill-tag"><i class="fas fa-gears"></i> Assembly Design</div>
-                </div>
-            </div>
-
-            <div class="skill-category cat-it">
-                <canvas id="codeCanvas" class="card-canvas"></canvas>
-                <div class="category-header">
-                    <i class="fas fa-laptop-code"></i>
-                    <h3 class="category-title">Development</h3>
-                </div>
-                <div class="skills-list">
-                    <div class="skill-tag"><i class="fab fa-python"></i> Python</div>
-                    <div class="skill-tag"><i class="fab fa-js"></i> JavaScript</div>
-                    <div class="skill-tag"><i class="fab fa-react"></i> React</div>
-                    <div class="skill-tag"><i class="fas fa-robot"></i> Automation</div>
-                    <div class="skill-tag"><i class="fab fa-git-alt"></i> Git</div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-<!-- 4. Projects (Categories) -->
-    <section id="projects">
-        <h2 class="reveal">Selected Works</h2>
-        <div class="category-grid reveal">
-            <!-- Category 1: Industrial Design -->
-            <div class="work-category-card design-cat" onclick="openModal('design')">
-                <div class="cat-content">
-                    <i class="fas fa-pen-nib cat-icon"></i>
-                    <h3>Industrial Design</h3>
-                    <p>Physical products, surfacing, and manufacturing.</p>
-                    <span class="btn-text">View Projects <i class="fas fa-arrow-right"></i></span>
-                </div>
-                <div class="cat-overlay"></div>
-            </div>
-        <!-- Category 3: Hybrid / Automation (The Bridge) -->
-            <div class="work-category-card hybrid-cat" onclick="openModal('hybrid')">
-                <div class="cat-content">
-                    <i class="fas fa-network-wired cat-icon"></i>
-                    <h3>Automation & Integration</h3>
-                    <p>Parametric templates, IoT systems, and design-to-code workflows.</p>
-                    <span class="btn-text">View Solutions <i class="fas fa-arrow-right"></i></span>
-                </div>
-                <div class="cat-overlay"></div>
-            </div>    
-            <!-- Category 2: Development -->
-            <div class="work-category-card dev-cat" onclick="openModal('dev')">
-                <div class="cat-content">
-                    <i class="fas fa-code cat-icon"></i>
-                    <h3>Development</h3>
-                    <p>Web apps, automation scripts, and full-stack solutions.</p>
-                    <span class="btn-text">View Projects <i class="fas fa-arrow-right"></i></span>
-                </div>
-                <div class="cat-overlay"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. Contact -->
-    <section id="contact">
-        <div class="contact-box reveal">
-            <h2>Let's Work Together</h2>
-            <p>Send me a message and I'll get back to you within 24 hours.</p>
-            
- <!-- Updated Contact Form -->
-            <form id="contact-form" class="contact-form">
-                <div class="form-group">
-                    <label for="name">Your Name</label>
-                    <input type="text" id="name" name="name" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" class="form-control" required>
-                </div>               
-                 <div class="form-group">
-                    <label for="tel">Tel. Number</label>
-                    <input type="tel" id="tel-number" name="tel" class="form-control" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="e.g., 123-456-7890" required>
-                </div>
-
-
-                <!-- NEW: File Upload Input -->
-                <div class="form-group">
-                    <label for="attachment">Attachment (Optional image/file)</label>
-                    <input type="file" id="attachment" name="attachment" class="form-control file-input">
-                </div>
-                
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" class="form-control" required></textarea>
-                </div>
-
-                <!-- Status Message Area -->
-                <p id="my-form-status"></p>
-
-                <button type="submit" id="submit-btn" class="btn btn-primary" style="width:100%; justify-content:center;">
-                    Send Message <i class="fas fa-paper-plane"></i>
-                </button>
-            </form>
-
-            <div class="social-links">
-                <a href="https://www.linkedin.com/in/christopher-j-pid-078953212/" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
-                <a href="https://github.com/topher1993" class="social-btn"><i class="fab fa-github"></i></a>
-                <a href="#" class="social-btn"><i class="fab fa-behance"></i></a>
-            </div>
-        </div>
-    </section>
-
-    <footer><p>&copy; 2025 Portfolio. Christopher Pid.</p></footer>
-    
-
-    <!-- Project Modal Overlay -->
-    <div id="projectModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2 id="modalTitle">Category Name</h2>
-                <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body" id="modalProjectList">
-                <!-- Projects will be injected here by JavaScript -->
-            </div>
-        </div>
-    </div>
-
-    <!-- AI Chatbot Widget -->
-    <div class="chat-toggle-btn" id="chatToggle">
-        <i class="fas fa-robot"></i>
-    </div>
-
-    <div class="chat-window" id="chatWindow">
-        <div class="chat-header">
-            <h3><div class="ai-status-dot"></div> Christopher's online persona</h3>
-            <button onclick="toggleChat()" style="background:none; border:none; color:white; cursor:pointer;"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <div class="chat-messages" id="chatMessages">
-            <!-- Initial Greeting -->
-            <div class="message bot-msg">
-                Hi! I'm Christopher's online persona my knowledge-base are from Christopher's personal information, resume and projects. Ask me anything! 
-                <br><br><i>e.g., "What is his experience with CATIA?"</i>
-            </div>
-        </div>
-        
-        <div class="typing-indicator" id="typingIndicator">Christopher AI is typing...</div>
-
-        <form class="chat-input-area" id="chatForm">
-            <input type="text" id="userInput" class="chat-input" placeholder="Type your question..." autocomplete="off">
-            <button type="submit" class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+        <p class="persona-typing" id="persona-typing" role="status">Christopher AI is thinking<span>...</span></p>
+        <form class="persona-form" id="persona-form">
+            <label class="sr-only" for="persona-input">Ask Christopher AI a question</label>
+            <input id="persona-input" type="text" placeholder="Ask about experience or projects…" autocomplete="off" maxlength="240">
+            <button type="submit" aria-label="Send question">→</button>
         </form>
-    </div>
+        <p class="persona-disclosure" id="persona-disclosure">Curated portfolio knowledge · MiniMax ready</p>
+    </aside>
 
-        <!-- External JavaScript -->
-    <script type="module" src="./script/script.js"></script>
+    <script src="./script/script.js?v=20260720-minimax-live" defer></script>
 </body>
-
 </html>
-
