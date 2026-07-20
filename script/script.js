@@ -1,561 +1,426 @@
-// ==========================================
-// 1. IMPORTS & SETUP
-// ==========================================
-import { db } from './firebase-config.js';
-import { collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+const menuButton = document.querySelector('.menu-button');
+const menu = document.querySelector('.nav-links');
 
-// ==========================================
-// 2. SCROLL REVEAL ANIMATION
-// ==========================================
-function reveal() {
-    var reveals = document.querySelectorAll(".reveal");
-    for (var i = 0; i < reveals.length; i++) {
-        var windowHeight = window.innerHeight;
-        var elementTop = reveals[i].getBoundingClientRect().top;
-        if (elementTop < windowHeight - 150) {
-            reveals[i].classList.add("active");
-        }
-    }
+function setMenu(open) {
+    if (!menuButton || !menu) return;
+    menuButton.setAttribute('aria-expanded', String(open));
+    menu.classList.toggle('is-open', open);
+    document.body.classList.toggle('menu-open', open);
 }
-window.addEventListener("scroll", reveal);
-reveal();
 
-// ==========================================
-// 3. CONSTELLATION / MIND MAP ANIMATION
-// ==========================================
+menuButton?.addEventListener('click', () => {
+    setMenu(menuButton.getAttribute('aria-expanded') !== 'true');
+});
 
-// --- DATA: The Mind Map Tags ---
-const idTags = [
-    "Design Thinking", "User Research", "Sketching", "Ergonomics","Generative Shape Design","Part Design",
-    "CAD", "Rendering", "Prototyping", "Manufacturing", "CMF", "Form Giving", "Sustainability",
-    "SolidWorks", "Rhino", "KeyShot", "Adobe CC","Catia v5"
-];
+menu?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => setMenu(false));
+});
 
-const fsTags = [
-    "HTML/CSS/JS", "React", "Redux", "Tailwind",
-    "Node.js", "API Design", "Auth", "SQL", "MongoDB", "Redis",
-    "Git", "Docker", "AWS", "CI/CD"
-];
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setMenu(false);
+});
 
-const bridgeTags = [
-    "Physical-Digital", "IoT", "Interaction Design", 
-    "Digital Fabrication", "Three.js", "WebGL"
-];
+const revealItems = document.querySelectorAll('.reveal');
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// --- Class Definition ---
-class ConstellationEffect {
-    constructor(canvasId, options) {
-        this.canvas = document.getElementById(canvasId);
-        if (!this.canvas) return;
+const constellationCanvas = document.getElementById('knowledgeConstellation');
 
-        this.ctx = this.canvas.getContext('2d');
+class KnowledgeConstellation {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.context = canvas.getContext('2d');
         this.width = 0;
         this.height = 0;
-        this.particles = [];
+        this.nodes = [];
+        this.animationFrame = null;
+        this.resizeFrame = null;
+        this.time = 0;
+        this.pointer = { x: -1000, y: -1000 };
 
-        this.tags = options.tags || [];
-        this.baseColor = options.baseColor || {r:255, g:255, b:255};
-        this.enableText = options.enableText !== false;
-        this.density = options.density || 1;
-        this.lineDist = options.lineDist || 130;
-        this.lineWidth = options.lineWidth || 0.8; 
+        this.knowledge = [
+            { label: 'CATIA V5', x: 0.1, y: 0.22, color: '#ff8d4d' },
+            { label: 'Surface Design', x: 0.27, y: 0.13, color: '#ff8d4d' },
+            { label: 'Manufacturing', x: 0.2, y: 0.43, color: '#ff8d4d' },
+            { label: 'Parametric CAD', x: 0.35, y: 0.62, color: '#ff8d4d' },
+            { label: 'Python', x: 0.48, y: 0.3, color: '#c9ff57' },
+            { label: 'Automation', x: 0.56, y: 0.52, color: '#c9ff57' },
+            { label: 'IoT', x: 0.48, y: 0.76, color: '#c9ff57' },
+            { label: 'React', x: 0.7, y: 0.2, color: '#79a8ff' },
+            { label: 'TypeScript', x: 0.82, y: 0.36, color: '#79a8ff' },
+            { label: 'Mobile Apps', x: 0.72, y: 0.66, color: '#79a8ff' },
+            { label: 'AI Tools', x: 0.9, y: 0.58, color: '#79a8ff' },
+            { label: 'Product Thinking', x: 0.84, y: 0.82, color: '#e9efe9' }
+        ];
 
-        window.addEventListener('resize', () => this.resize());
+        this.onResize = () => {
+            cancelAnimationFrame(this.resizeFrame);
+            this.resizeFrame = requestAnimationFrame(() => this.resize());
+        };
+
+        this.onPointerMove = (event) => {
+            const bounds = this.canvas.getBoundingClientRect();
+            this.pointer.x = event.clientX - bounds.left;
+            this.pointer.y = event.clientY - bounds.top;
+        };
+
+        this.onPointerLeave = () => {
+            this.pointer.x = -1000;
+            this.pointer.y = -1000;
+        };
+
+        this.onVisibilityChange = () => {
+            if (document.hidden) {
+                cancelAnimationFrame(this.animationFrame);
+                this.animationFrame = null;
+            } else if (!reduceMotion && !this.animationFrame) {
+                this.animate();
+            }
+        };
+
+        window.addEventListener('resize', this.onResize);
+        window.addEventListener('pointermove', this.onPointerMove, { passive: true });
+        document.addEventListener('mouseleave', this.onPointerLeave);
+        document.addEventListener('visibilitychange', this.onVisibilityChange);
+
         this.resize();
-        this.init();
-        this.animate();
+        if (reduceMotion) this.draw();
+        else this.animate();
+    }
+
+    seededValue(index) {
+        const value = Math.sin(index * 9283.17 + 41.73) * 43758.5453;
+        return value - Math.floor(value);
     }
 
     resize() {
-        const parent = this.canvas.parentElement;
-        this.width = this.canvas.width = parent.offsetWidth;
-        this.height = this.canvas.height = parent.offsetHeight;
-        this.init(); 
+        const bounds = this.canvas.getBoundingClientRect();
+        const density = Math.min(window.devicePixelRatio || 1, 2);
+        this.width = Math.max(1, Math.round(bounds.width));
+        this.height = Math.max(1, Math.round(bounds.height));
+        this.canvas.width = Math.round(this.width * density);
+        this.canvas.height = Math.round(this.height * density);
+        this.context.setTransform(density, 0, 0, density, 0, 0);
+        this.createNodes();
+        this.draw();
     }
 
-    init() {
-        this.particles = [];
-        // Text Nodes
-        if (this.tags.length > 0) {
-            this.tags.forEach(tagObj => {
-                let text = typeof tagObj === 'string' ? tagObj : tagObj.text;
-                let color = typeof tagObj === 'string' ? `rgba(${this.baseColor.r},${this.baseColor.g},${this.baseColor.b}, 1)` : tagObj.color;
-                this.particles.push({
-                    x: Math.random() * this.width,
-                    y: Math.random() * this.height,
-                    vx: (Math.random() - 0.5) * 0.3,
-                    vy: (Math.random() - 0.5) * 0.3,
-                    size: 3, text: text, isNode: true, color: color
-                });
+    createNodes() {
+        const compact = this.width < 700;
+        const visibleKnowledge = compact
+            ? this.knowledge.filter((_, index) => index % 2 === 0)
+            : this.knowledge;
+
+        this.nodes = visibleKnowledge.map((item, index) => ({
+            ...item,
+            x: item.x * this.width,
+            y: item.y * this.height,
+            vx: (this.seededValue(index + 2) - 0.5) * 0.32,
+            vy: (this.seededValue(index + 19) - 0.5) * 0.32,
+            radius: compact ? 2.8 : 3.4,
+            phase: this.seededValue(index + 28) * Math.PI * 2,
+            isKnowledge: true
+        }));
+
+        const satelliteCount = compact ? 10 : 24;
+        for (let index = 0; index < satelliteCount; index += 1) {
+            this.nodes.push({
+                x: this.seededValue(index + 40) * this.width,
+                y: this.seededValue(index + 80) * this.height,
+                vx: (this.seededValue(index + 120) - 0.5) * 0.48,
+                vy: (this.seededValue(index + 160) - 0.5) * 0.48,
+                radius: 0.9 + this.seededValue(index + 200) * 1.35,
+                phase: this.seededValue(index + 240) * Math.PI * 2,
+                color: index % 3 === 0 ? '#c9ff57' : '#708078',
+                isKnowledge: false
             });
         }
-        // Satellite Nodes
-        const extraParticles = 40 * this.density; 
-        for (let i = 0; i < extraParticles; i++) {
-            this.particles.push({
-                x: Math.random() * this.width,
-                y: Math.random() * this.height,
-                vx: (Math.random() - 0.5) * 0.5,
-                vy: (Math.random() - 0.5) * 0.5,
-                size: Math.random() * 1.5 + 0.5,
-                text: null, isNode: false,
-                color: `rgba(${this.baseColor.r},${this.baseColor.g},${this.baseColor.b}, 0.5)`
-            });
+    }
+
+    update() {
+        this.time += 0.018;
+        this.nodes.forEach((node) => {
+            node.x += node.vx;
+            node.y += node.vy;
+
+            if (node.x < 12 || node.x > this.width - 12) node.vx *= -1;
+            if (node.y < 12 || node.y > this.height - 12) node.vy *= -1;
+        });
+    }
+
+    drawConnections() {
+        const connectionDistance = this.width < 700 ? 135 : 205;
+
+        for (let first = 0; first < this.nodes.length; first += 1) {
+            for (let second = first + 1; second < this.nodes.length; second += 1) {
+                const a = this.nodes[first];
+                const b = this.nodes[second];
+                const distance = Math.hypot(a.x - b.x, a.y - b.y);
+                if (distance > connectionDistance) continue;
+
+                const pointerDistance = Math.min(
+                    Math.hypot(a.x - this.pointer.x, a.y - this.pointer.y),
+                    Math.hypot(b.x - this.pointer.x, b.y - this.pointer.y)
+                );
+                const active = pointerDistance < 170;
+                const pulse = 0.88 + Math.sin(this.time * 1.4 + first * 0.4) * 0.12;
+                const alpha = (1 - distance / connectionDistance) * (active ? 0.9 : 0.55) * pulse;
+
+                this.context.beginPath();
+                this.context.moveTo(a.x, a.y);
+                this.context.lineTo(b.x, b.y);
+                this.context.strokeStyle = `rgba(201, 255, 87, ${alpha})`;
+                this.context.lineWidth = active ? 1.45 : 0.9;
+                this.context.stroke();
+            }
         }
+    }
+
+    drawNodes() {
+        const compact = this.width < 700;
+
+        this.nodes.forEach((node) => {
+            const pointerDistance = Math.hypot(node.x - this.pointer.x, node.y - this.pointer.y);
+            const active = pointerDistance < 140;
+            const pulse = Math.sin(this.time * 2 + node.phase) * 0.75;
+
+            this.context.save();
+            this.context.shadowColor = node.color;
+            this.context.shadowBlur = active ? 22 : node.isKnowledge ? 13 : 7;
+            this.context.beginPath();
+            this.context.arc(node.x, node.y, node.radius + pulse + (active ? 1.5 : 0), 0, Math.PI * 2);
+            this.context.fillStyle = node.color;
+            this.context.fill();
+            this.context.restore();
+
+            if (!node.isKnowledge) return;
+
+            this.context.font = `500 ${compact ? 9 : 11}px "IBM Plex Mono", monospace`;
+            this.context.fillStyle = active ? 'rgba(255, 255, 255, 1)' : 'rgba(233, 239, 233, 0.9)';
+            this.context.fillText(node.label, node.x + 11, node.y + 4);
+        });
+    }
+
+    draw() {
+        this.context.clearRect(0, 0, this.width, this.height);
+        this.drawConnections();
+        this.drawNodes();
     }
 
     animate() {
-        this.ctx.clearRect(0, 0, this.width, this.height);
-        this.particles.forEach(p => {
-            p.x += p.vx; p.y += p.vy;
-            if (p.x < 0 || p.x > this.width) p.vx *= -1;
-            if (p.y < 0 || p.y > this.height) p.vy *= -1;
-
-            this.ctx.fillStyle = p.color;
-            this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            this.ctx.fill();
-
-            if (p.isNode && this.enableText) {
-                this.ctx.font = "10px Inter";
-                this.ctx.fillStyle = p.color.replace('1)', '0.7)');
-                this.ctx.fillText(p.text, p.x + 8, p.y + 3);
-            }
-        });
-
-        for (let i = 0; i < this.particles.length; i++) {
-            for (let j = i + 1; j < this.particles.length; j++) {
-                const p1 = this.particles[i];
-                const p2 = this.particles[j];
-                const dist = Math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2);
-
-                if (dist < this.lineDist) {
-                    this.ctx.beginPath();
-                    const alpha = 1 - (dist / this.lineDist); 
-                    if(p1.color === p2.color) {
-                         this.ctx.strokeStyle = p1.color.replace('1)', `${alpha})`).replace('0.5)', `${alpha})`);
-                    } else {
-                        this.ctx.strokeStyle = `rgba(148, 163, 184, ${alpha * 0.5})`;
-                    }
-                    this.ctx.lineWidth = this.lineWidth;
-                    this.ctx.moveTo(p1.x, p1.y);
-                    this.ctx.lineTo(p2.x, p2.y);
-                    this.ctx.stroke();
-                }
-            }
-        }
-        requestAnimationFrame(this.animate.bind(this));
+        this.update();
+        this.draw();
+        this.animationFrame = requestAnimationFrame(() => this.animate());
     }
 }
 
-// --- Initialize Animations ---
-const heroData = [
-    ...idTags.map(t => ({ text: t, color: "rgba(20, 184, 166, 1)" })),
-    ...fsTags.map(t => ({ text: t, color: "rgba(59, 130, 246, 1)" })),
-    ...bridgeTags.map(t => ({ text: t, color: "rgba(255, 255, 255, 1)" }))
+if (constellationCanvas) new KnowledgeConstellation(constellationCanvas);
+
+if (reduceMotion || !('IntersectionObserver' in window)) {
+    revealItems.forEach((item) => item.classList.add('is-visible'));
+} else {
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px' });
+
+    revealItems.forEach((item) => revealObserver.observe(item));
+}
+
+const year = document.getElementById('year');
+if (year) year.textContent = String(new Date().getFullYear());
+
+const contactForm = document.getElementById('contact-form');
+const formStatus = document.getElementById('form-status');
+
+contactForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const submitButton = contactForm.querySelector('button[type="submit"]');
+    const originalLabel = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Sending…';
+    formStatus.textContent = '';
+    formStatus.className = 'form-status';
+
+    try {
+        const response = await fetch('https://formspree.io/f/xwpgqarz', {
+            method: 'POST',
+            body: new FormData(contactForm),
+            headers: { Accept: 'application/json' }
+        });
+
+        if (!response.ok) throw new Error('Form submission failed');
+
+        contactForm.reset();
+        formStatus.textContent = 'Thanks—your message has been sent.';
+        formStatus.classList.add('success');
+    } catch (error) {
+        formStatus.innerHTML = 'The form could not send. Please email <a href="mailto:swtopherpid09@gmail.com">swtopherpid09@gmail.com</a> instead.';
+        formStatus.classList.add('error');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalLabel;
+    }
+});
+
+const personaToggle = document.getElementById('persona-toggle');
+const personaPanel = document.getElementById('persona-panel');
+const personaClose = document.getElementById('persona-close');
+const personaForm = document.getElementById('persona-form');
+const personaInput = document.getElementById('persona-input');
+const personaMessages = document.getElementById('persona-messages');
+const personaTyping = document.getElementById('persona-typing');
+const personaDisclosure = document.getElementById('persona-disclosure');
+const personaEndpoint = document.querySelector('meta[name="christopher-ai-endpoint"]')?.content.trim() || '';
+const personaConversation = [];
+let personaBusy = false;
+
+const personaAnswers = [
+    {
+        keywords: ['hire', 'why', 'value', 'different', 'unique'],
+        answer: 'Christopher bridges two worlds that are usually separated: 10+ years of CAD and manufacturing experience, plus hands-on software product development. He can understand the physical constraint, design the workflow, and build the tool that removes repetitive work—without losing sight of the people using it.'
+    },
+    {
+        keywords: ['catia', 'cad', 'surface', 'manufacturing', 'product design'],
+        answer: 'Christopher has more than a decade of experience across CATIA V5, surface and part design, assemblies, drafting, CAD/CAM, and manufacturing workflows. His strongest value is turning that specialist engineering knowledge into reusable parametric methods and automation.'
+    },
+    {
+        keywords: ['japanese', 'tutor', 'learning'],
+        answer: 'Japanese Tutor is an active Expo and React Native learning app with structured lessons, quiz grading, progress and streak services, and an offline-ready data foundation. It demonstrates Christopher’s product thinking, TypeScript implementation, and focus on dependable learning flows.'
+    },
+    {
+        keywords: ['agent army', 'stronghold', 'agent', 'ai project'],
+        answer: 'Agent Army Stronghold explores coordinated AI-agent workflows and practical tooling around multi-agent development. It reflects Christopher’s interest in making AI systems useful, inspectable, and connected to real engineering work.'
+    },
+    {
+        keywords: ['quickscan', 'quick scan', 'scanner', 'payment'],
+        answer: 'QuickScan Pay is a mobile-first QR workflow focused on fast, clear transactions. It is one of Christopher’s examples of translating a practical everyday process into a focused digital product.'
+    },
+    {
+        keywords: ['project', 'portfolio', 'latest', 'work', 'build'],
+        answer: 'His current portfolio highlights Japanese Tutor, Agent Army Stronghold, QuickScan Pay, and Parametric CAD Workflows. Together they show the full range: mobile products, AI tooling, practical interfaces, and manufacturing automation.'
+    },
+    {
+        keywords: ['react', 'typescript', 'python', 'software', 'developer', 'code'],
+        answer: 'Christopher builds with React, React Native, TypeScript, JavaScript, Python, Node.js, SQL, and automation tools. He applies them as product tools—not just technologies—especially where software can simplify an engineering or operational workflow.'
+    },
+    {
+        keywords: ['available', 'contact', 'email', 'opportunity', 'role'],
+        answer: 'Christopher is open to conversations about product design, CAD automation, software products, and hybrid engineering roles. The fastest way to reach him is swtopherpid09@gmail.com, or you can use the contact form on this page.'
+    }
 ];
 
-// 1. Hero Canvas
-new ConstellationEffect('heroCanvas', { tags: heroData, lineDist: 120, lineWidth: 0.6, density: 1.5 });
-// 2. ID Card Canvas
-const idCardData = idTags.map(t => ({ text: t, color: "rgba(20, 184, 166, 1)" }));
-new ConstellationEffect('designCanvas', { tags: idCardData, baseColor: {r:20, g:184, b:166}, lineDist: 100, density: 0.8, enableText: true });
-// 3. Dev Card Canvas
-const fsCardData = fsTags.map(t => ({ text: t, color: "rgba(59, 130, 246, 1)" }));
-new ConstellationEffect('codeCanvas', { tags: fsCardData, baseColor: {r:59, g:130, b:246}, lineDist: 100, density: 0.8, enableText: true });
-
-
-// ==========================================
-// 4. FIREBASE PROJECT FETCHING
-// ==========================================
-let projectsData = {
-    design: [],
-    dev: [],
-    hybrid: []
-};
-
-async function fetchProjects() {
-    try {
-        const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
-        const querySnapshot = await getDocs(q);
-
-        // Reset arrays
-        projectsData.design = [];
-        projectsData.dev = [];
-        projectsData.hybrid = []; // <--- Reset this one too
-
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            // Sort based on category string
-            if (data.category === 'design') {
-                projectsData.design.push(data);
-            } else if (data.category === 'dev') {
-                projectsData.dev.push(data);
-            } else if (data.category === 'hybrid') { // <--- NEW CHECK
-                projectsData.hybrid.push(data);
-            }
-        });
-        console.log("Projects loaded:", projectsData);
-    } catch (error) {
-        console.error("Error fetching projects:", error);
-    }
-}
-// Load projects immediately
-document.addEventListener("DOMContentLoaded", fetchProjects);
-
-
-// ==========================================
-// 5. MODAL LOGIC (With Reviews)
-// ==========================================
-const modal = document.getElementById('projectModal');
-const modalTitle = document.getElementById('modalTitle');
-const modalList = document.getElementById('modalProjectList');
-
-window.openModal = async function(category) {
-    console.log("Clicked category:", category);
-    modalList.innerHTML = '';
-    // --- UPDATED TITLE LOGIC ---
-    let title = "";
-    if (category === 'design') {
-        title = "Industrial Design Projects";
-    } else if (category === 'dev') {
-        title = "Development Projects";
-    } else {
-        // This handles the new 'hybrid' category
-        title = "Hybrid Automation Solutions"; 
-    }
-    modalTitle.innerText = title;
-    // ---------------------------
-    
-    const data = projectsData[category];
-
-    // If no data loaded yet (or empty)
-    if (!data || data.length === 0) {
-        modalList.innerHTML = '<p style="text-align:center; color:#94a3b8;">Loading projects from database...</p>';
-        // Optional: Retry fetch or just wait
-        if (data && data.length === 0) {
-            modalList.innerHTML = '<p style="text-align:center; color:#94a3b8;">No projects found in this category yet.</p>';
-        }
-        return;
-    }
-
-    for (const project of data) {
-        const statusClass = project.status === 'Finished' ? 'status-done' : 'status-ongoing';
-        const linkHtml = project.link && project.link !== "#" ? `<a href="${project.link}" target="_blank" class="modal-btn">View Project <i class="fas fa-external-link-alt"></i></a>` : '';
-        
-        const typeBadgeClass = project.type.includes("Paid") ? "badge-paid" : "badge-personal";
-        const roleBadgeClass = project.roleType.includes("Solo") ? "badge-solo" : "badge-collab";
-
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'project-item';
-        itemDiv.onclick = () => toggleDetails(itemDiv, project.id);
-
-        itemDiv.innerHTML = `
-            <div class="project-summary">
-                <div class="project-title">
-                    <h4>${project.title} <span class="project-status ${statusClass}">${project.status}</span></h4>
-                </div>
-                <i class="fas fa-chevron-down toggle-icon"></i>
-            </div>
-            <div class="project-details">
-                <div class="modal-meta-tags">
-                    <span class="meta-badge ${typeBadgeClass}">${project.type}</span>
-                    <span class="meta-badge ${roleBadgeClass}">${project.roleType}</span>
-                </div>
-                <div class="detail-section"><h5>Description</h5><p>${project.desc}</p></div>
-                <div class="detail-section">
-                    <h5>Technologies</h5>
-                    <div class="tech-tags">${project.tech.map(t => `<span>${t}</span>`).join('')}</div>
-                </div>
-                <div class="detail-section">
-                    <h5>Key Thoughts</h5>
-                    <p style="font-style: italic; color: #94a3b8;">"${project.thoughts}"</p>
-                </div>
-                <div id="review-container-${project.id}"></div>
-                ${linkHtml}
-            </div>
-        `;
-        modalList.appendChild(itemDiv);
-    }
-
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+function setPersona(open) {
+    if (!personaToggle || !personaPanel) return;
+    personaToggle.setAttribute('aria-expanded', String(open));
+    personaPanel.setAttribute('aria-hidden', String(!open));
+    personaPanel.classList.toggle('is-open', open);
+    if (open) window.setTimeout(() => personaInput?.focus(), 220);
 }
 
-window.closeModal = function() {
-    modal.classList.remove('open');
-    document.body.style.overflow = 'auto';
+function appendPersonaMessage(text, sender) {
+    if (!personaMessages) return;
+    const message = document.createElement('div');
+    message.className = `persona-message persona-message-${sender}`;
+    message.textContent = text;
+    personaMessages.appendChild(message);
+    personaMessages.scrollTop = personaMessages.scrollHeight;
 }
 
-window.toggleDetails = async function(element, projectId) {
-    document.querySelectorAll('.project-item').forEach(item => {
-        if (item !== element) item.classList.remove('active');
+function answerPersonaQuestion(question) {
+    const normalized = question.toLowerCase();
+    const ranked = personaAnswers
+        .map((entry) => ({
+            ...entry,
+            score: entry.keywords.reduce((total, keyword) => total + (normalized.includes(keyword) ? keyword.length : 0), 0)
+        }))
+        .sort((a, b) => b.score - a.score);
+
+    if (ranked[0]?.score > 0) return ranked[0].answer;
+    return 'Christopher’s work sits at the intersection of product design, manufacturing, automation, and software. Try asking about his CATIA background, current projects, development skills, availability, or why that hybrid perspective is valuable.';
+}
+
+async function requestMiniMaxAnswer(message) {
+    if (!personaEndpoint) return null;
+
+    const response = await fetch(personaEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message,
+            history: personaConversation.slice(-6)
+        })
     });
 
-    element.classList.toggle('active');
-
-    if (element.classList.contains('active')) {
-        const reviewContainer = document.getElementById(`review-container-${projectId}`);
-        if (reviewContainer && reviewContainer.innerHTML === "") {
-            reviewContainer.innerHTML = '<p style="font-size:0.8rem; color:var(--primary-color);">Checking for reviews...</p>';
-            
-            try {
-                const reviewsRef = collection(db, "reviews");
-                const q = query(reviewsRef, where("projectId", "==", projectId), where("approved", "==", true));
-                const querySnapshot = await getDocs(q);
-
-                reviewContainer.innerHTML = ""; 
-
-                if (!querySnapshot.empty) {
-                    querySnapshot.forEach((doc) => {
-                        const review = doc.data();
-                        const initial = review.author.charAt(0);
-                        
-                        const reviewHtml = `
-                            <div class="review-section">
-                                <h5 style="color:var(--accent-color); margin-bottom:10px;">Client Feedback</h5>
-                                <div class="review-box">
-                                    <i class="fas fa-quote-left"></i>
-                                    <p class="review-text">"${review.text}"</p>
-                                    <div class="review-author">
-                                        <div class="author-avatar">${initial}</div>
-                                        <div class="author-info">
-                                            <h6>${review.author}</h6>
-                                            <span>${review.position}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        reviewContainer.innerHTML += reviewHtml;
-                    });
-                }
-            } catch (error) {
-                console.error("Firebase Review Error:", error);
-                reviewContainer.innerHTML = ""; 
-            }
-        }
+    if (!response.ok) throw new Error(`Christopher AI request failed with status ${response.status}`);
+    const payload = await response.json();
+    if (typeof payload.answer !== 'string' || !payload.answer.trim()) {
+        throw new Error('Christopher AI returned an invalid response');
     }
+    return payload.answer.trim();
 }
 
-window.onclick = function(event) {
-    if (event.target == modal) closeModal();
-}
+async function submitPersonaQuestion(question) {
+    const cleanQuestion = question.trim();
+    if (!cleanQuestion || !personaInput || !personaTyping || personaBusy) return;
 
-
-// ==========================================
-// 6. CONTACT FORM (FORMSPREE)
-// ==========================================
-// Note: Ensure your HTML contact form uses these IDs
-const contactForm = document.getElementById("contact-form");
-if (contactForm) {
-    contactForm.addEventListener("submit", async function(event) {
-        event.preventDefault();
-        const status = document.getElementById("my-form-status");
-        const btn = document.getElementById("submit-btn");
-        const data = new FormData(event.target);
-
-        const originalBtnText = btn.innerHTML;
-        btn.innerHTML = 'Sending... <i class="fas fa-spinner fa-spin"></i>';
-        btn.disabled = true;
-
-        // REPLACE WITH YOUR FORMSPREE URL
-        fetch("https://formspree.io/f/xwpgqarz", {
-            method: "POST",
-            body: data,
-            headers: { 'Accept': 'application/json' }
-        }).then(response => {
-            if (response.ok) {
-                status.innerHTML = "Thanks! Message received.";
-                status.classList.remove("status-error"); status.classList.add("status-success");
-                contactForm.reset();
-            } else {
-                status.innerHTML = "Oops! Error sending message.";
-                status.classList.remove("status-success"); status.classList.add("status-error");
-            }
-        }).catch(error => {
-            status.innerHTML = "Network error.";
-            status.classList.remove("status-success"); status.classList.add("status-error");
-        }).finally(() => {
-            btn.innerHTML = originalBtnText;
-            btn.disabled = false;
-            setTimeout(() => { status.style.display = 'none'; }, 5000);
-        });
-    });
-}
-
-// ==========================================
-// 7. MOBILE MENU LOGIC
-// ==========================================
-const menuToggle = document.getElementById('menu-toggle');
-const navLinks = document.querySelector('.nav-links');
-const menuIcon = document.querySelector('.menu-icon');
-
-if (menuToggle) {
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => { menuToggle.checked = false; });
-    });
-
-    document.addEventListener('click', (e) => {
-        if (menuToggle.checked) {
-            if (!navLinks.contains(e.target) && !menuIcon.contains(e.target) && e.target !== menuToggle) {
-                menuToggle.checked = false;
-            }
-        }
-    });
-}
-
-// ==========================================
-// 8. AI CHATBOT UI LOGIC
-// ==========================================
-const chatToggle = document.getElementById('chatToggle');
-const chatWindow = document.getElementById('chatWindow');
-
-// Expose to window for the 'X' button in HTML
-window.toggleChat = function() {
-    chatWindow.classList.toggle('active');
-    
-    // Icon animation swap
-    const icon = chatToggle.querySelector('i');
-    if (chatWindow.classList.contains('active')) {
-        icon.classList.remove('fa-robot');
-        icon.classList.add('fa-chevron-down');
-    } else {
-        icon.classList.remove('fa-chevron-down');
-        icon.classList.add('fa-robot');
-    }
-}
-
-chatToggle.addEventListener('click', window.toggleChat);
-// ==========================================
-// 9. AI CHATBOT LOGIC (DYNAMIC BRAIN)
-// ==========================================
-
-import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-// Added 'doc' and 'getDoc' to imports
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; 
-
-// Gemini calls must go through a backend/proxy. Do not expose API keys in browser code.
-const GEMINI_API_KEY = null;
-
-const chatForm = document.getElementById('chatForm');
-const userInput = document.getElementById('userInput');
-const chatMessages = document.getElementById('chatMessages');
-const typingIndicator = document.getElementById('typingIndicator');
-
-// CACHE: Store profile data here so we don't fetch it on every single message
-let cachedProfileData = null;
-
-async function getSystemContext() {
-    // 1. If we already have the data, return it (Save reads)
-    if (cachedProfileData) return cachedProfileData;
+    personaBusy = true;
+    appendPersonaMessage(cleanQuestion, 'user');
+    personaInput.value = '';
+    personaTyping.classList.add('is-visible');
 
     try {
-        // 2. Fetch from Firestore (Single Source of Truth)
-        console.log("Fetching AI Brain from Database...");
-        const docRef = doc(db, "profile", "main");
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            // Format it back into a string prompt
-            cachedProfileData = `
-            You are the AI Assistant for Christopher Pid.
-            --- CORE IDENTITY ---
-            ${data.identity}
-            --- PHILOSOPHY ---
-            ${data.philosophy}
-            --- WORK HISTORY ---
-            ${data.history}
-            --- TECHNICAL SKILLS ---
-            ${data.skills}
-            --- INSTRUCTIONS ---
-            ${data.instructions}
-            `;
-        } else {
-            console.warn("No profile data found in DB. Using fallback.");
-            cachedProfileData = "You are a helpful assistant for Christopher Pid.";
+        const miniMaxAnswer = await requestMiniMaxAnswer(cleanQuestion);
+        const answer = miniMaxAnswer || answerPersonaQuestion(cleanQuestion);
+        personaConversation.push(
+            { role: 'user', content: cleanQuestion },
+            { role: 'assistant', content: answer }
+        );
+        appendPersonaMessage(answer, 'ai');
+        if (personaDisclosure) {
+            personaDisclosure.textContent = miniMaxAnswer
+                ? 'Powered by MiniMax M2.7 · Curated Christopher knowledge'
+                : 'Curated portfolio knowledge · MiniMax ready';
         }
     } catch (error) {
-        console.error("Error fetching profile:", error);
-        cachedProfileData = "You are a helpful assistant.";
+        const fallbackAnswer = answerPersonaQuestion(cleanQuestion);
+        personaConversation.push(
+            { role: 'user', content: cleanQuestion },
+            { role: 'assistant', content: fallbackAnswer }
+        );
+        appendPersonaMessage(fallbackAnswer, 'ai');
+        if (personaDisclosure) personaDisclosure.textContent = 'Curated fallback active · MiniMax unavailable';
+    } finally {
+        personaTyping.classList.remove('is-visible');
+        personaBusy = false;
     }
-    return cachedProfileData;
 }
 
-function appendMessage(text, sender) {
-    const div = document.createElement('div');
-    div.classList.add('message', sender === 'user' ? 'user-msg' : 'bot-msg');
-    div.innerHTML = text.replace(/\n/g, '<br>'); 
-    chatMessages.appendChild(div);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+personaToggle?.addEventListener('click', () => {
+    setPersona(personaToggle.getAttribute('aria-expanded') !== 'true');
+});
 
-if (chatForm) {
-    chatForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const text = userInput.value.trim();
-        if (!text) return;
+personaClose?.addEventListener('click', () => setPersona(false));
 
-        appendMessage(text, 'user');
-        userInput.value = '';
-        typingIndicator.style.display = 'block';
+personaForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    void submitPersonaQuestion(personaInput?.value || '');
+});
 
-        try {
-            if (!GEMINI_API_KEY) {
-                typingIndicator.style.display = 'none';
-                appendMessage("The AI chat is temporarily disabled while Christopher moves it to a secure backend.", 'bot');
-                return;
-            }
-
-            // 1. Initialize AI (Make sure model is 'gemini-2.5-flash')
-            const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-            // 2. Build The "Sales" Context
-            const dynamicProfile = await getSystemContext();
-            const projectContext = JSON.stringify(projectsData); 
-            
-            // --- THE UPGRADE: SALES-ORIENTED SYSTEM PROMPT ---
-            const prompt = `
-            You are the "Business Development AI" for Christopher Pid. 
-            Your Goal: Impress potential clients and recruiters to get Christopher hired.
-            
-            --- YOUR PERSONA ---
-            1.  **Professional & Enthusiastic:** You are confident but polite.
-            2.  **The "Hybrid" Pitch:** Always look for opportunities to mention that Christopher is rare because he bridges "Physical Manufacturing" (CATIA/CAD) and "Digital Automation" (Coding/IoT). This saves companies time and money.
-            3.  **Concise:** Keep answers under 4-5 sentences unless asked for details. Use bullet points for readability.
-            
-            --- YOUR KNOWLEDGE BASE ---
-            ${dynamicProfile}
-            
-            --- HIS PORTFOLIO (Real-time Data) ---
-            ${projectContext}
-            
-            --- CONVERSATION RULES ---
-            1.  **If asked about skills:** Don't just list them. Explain *value*. (e.g., "He doesn't just know Python; he uses it to automate CAD workflows.")
-            2.  **If asked about availability:** "He is currently open to new opportunities! You should definitely message him."
-            3.  **If asked "Why should I hire him?":** Emphasize his ability to solve complex engineering problems with custom software tools.
-            4.  **Call to Action:** Occasionally end your response with a question like: "Would you like to know more about his automation work?" or "Shall I give you his direct email?"
-            
-            --- USER QUESTION ---
-            "${text}"
-            
-            Answer now as his Business Development AI:
-            `;
-
-            // 3. Generate
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const answer = response.text();
-
-            typingIndicator.style.display = 'none';
-            appendMessage(answer, 'bot');
-
-        } catch (error) {
-            console.error("AI Error:", error);
-            typingIndicator.style.display = 'none';
-            appendMessage("My brain is currently engaging in deep thought (Network Error). Please try again or email Christopher directly!", 'bot');
-        }
+document.querySelectorAll('[data-persona-question]').forEach((button) => {
+    button.addEventListener('click', () => {
+        void submitPersonaQuestion(button.dataset.personaQuestion || '');
     });
-}
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && personaToggle?.getAttribute('aria-expanded') === 'true') {
+        setPersona(false);
+        personaToggle.focus();
+    }
+});
