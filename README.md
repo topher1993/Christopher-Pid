@@ -10,14 +10,15 @@ GitHub Pages mirror: [topher1993.github.io/Christopher-Pid](https://topher1993.g
 
 ## Featured work
 
+- Engineering Resource Scheduler — private, local-first desktop and PWA scheduling system built with Python, FastAPI, SQLAlchemy, and SQLite.
 - [Japanese Tutor](https://github.com/topher1993/japanese-tutor) — Expo/React Native learning app with an offline-ready data foundation.
 - [Agent Army Stronghold](https://github.com/topher1993/Agent-Army-stronghold) — guarded React/TypeScript mission-control dashboard.
-- [QuickScan Pay](https://github.com/topher1993/QuickScan) — AI-assisted extraction and scan-record workflow.
+- [QuickScan Pay](https://github.com/topher1993/QuickScan) — local OCR and MiniMax M3-assisted payment-detail verification workflow.
 - Parametric CAD workflows — CATIA V5 templates and automation developed through professional product-design work.
 
 ## Stack
 
-The site uses semantic HTML, modern CSS, and vanilla JavaScript. Christopher AI uses a small Cloudflare Worker as a secure proxy to MiniMax M2.7; the browser never receives the MiniMax key.
+The site uses semantic HTML, modern CSS, and vanilla JavaScript. Christopher AI uses a small Cloudflare Worker as a secure proxy to MiniMax M3; the browser never receives the MiniMax key.
 
 ## Run locally
 
@@ -39,5 +40,5 @@ cv-template.html        Printable resume
 styles/style.css        Responsive visual system
 script/script.js        Navigation, constellation, contact, and AI persona behavior
 images/                 Profile and brand assets
-worker/                 Secure MiniMax M2.7 proxy and deployment configuration
+worker/                 Secure MiniMax M3 proxy and deployment configuration
 ```

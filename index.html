@@ -11,14 +11,14 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://christopher-portfolio93.web.app/">
     <meta property="og:title" content="Christopher Pid | From physical products to useful software">
-    <meta property="og:description" content="Selected work across CATIA V5, manufacturing automation, mobile learning, and AI-enabled web applications.">
+    <meta property="og:description" content="Selected work across engineering operations, CATIA V5, manufacturing automation, mobile learning, and AI-enabled applications.">
     <meta property="og:image" content="https://christopher-portfolio93.web.app/images/1759986216750.jpg">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" type="image/png" href="./images/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles/style.css?v=20260720-persona">
+    <link rel="stylesheet" href="./styles/style.css?v=20260801-scheduler">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -108,9 +108,29 @@
             </div>
 
             <div class="projects-grid">
-                <article class="project-card project-featured project-japanese reveal">
+                <article class="project-card project-featured project-wide project-scheduler reveal">
                     <div class="project-topline">
                         <span class="project-number">01</span>
+                        <span class="project-status">New · Private project</span>
+                    </div>
+                    <div class="project-content">
+                        <p class="project-kicker">Engineering operations · Local-first systems</p>
+                        <h3>Engineering Resource Scheduler</h3>
+                        <p>A production-ready desktop and PWA scheduling system that replaces spreadsheet-based guest-engineer planning with secure role-based workflows, conflict detection, transactional imports, auditability, and resilient backup and restore.</p>
+                        <ul class="project-proof" aria-label="Project highlights">
+                            <li>Private-LAN desktop and mobile workflow</li>
+                            <li>Availability and schedule-conflict engine</li>
+                            <li>Transactional Excel and CSV migration</li>
+                            <li>Role-aware access, audit logs, and recovery</li>
+                        </ul>
+                        <div class="tech-list"><span>Python</span><span>FastAPI</span><span>SQLAlchemy</span><span>SQLite</span><span>PWA</span><span>PyWebView</span><span>Playwright</span></div>
+                    </div>
+                    <span class="project-link project-link-muted" aria-label="Engineering Resource Scheduler is maintained in a private GitHub repository">Private repository · Case study available on request</span>
+                </article>
+
+                <article class="project-card project-featured project-japanese reveal">
+                    <div class="project-topline">
+                        <span class="project-number">02</span>
                         <span class="project-status">Active build</span>
                     </div>
                     <div class="project-content">
@@ -129,7 +149,7 @@
 
                 <article class="project-card project-featured project-stronghold reveal">
                     <div class="project-topline">
-                        <span class="project-number">02</span>
+                        <span class="project-number">03</span>
                         <span class="project-status">Deployed</span>
                     </div>
                     <div class="project-content">
@@ -148,21 +168,21 @@
 
                 <article class="project-card project-compact reveal">
                     <div class="project-topline">
-                        <span class="project-number">03</span>
-                        <span class="project-status">Full stack</span>
+                        <span class="project-number">04</span>
+                        <span class="project-status">Deployed AI</span>
                     </div>
                     <div class="project-content">
                         <p class="project-kicker">AI extraction · Fintech utility</p>
                         <h3>QuickScan Pay</h3>
-                        <p>Turns payment screenshots into structured scan records through an AI-assisted extraction flow and a lightweight storage API.</p>
-                        <div class="tech-list"><span>React</span><span>Gemini</span><span>Express</span><span>SQLite</span></div>
+                        <p>Reads payment screenshots locally, sends only extracted text to a secret-backed MiniMax M3 Worker, and requires a human verification step before opening GCash.</p>
+                        <div class="tech-list"><span>React</span><span>Tesseract.js</span><span>MiniMax M3</span><span>Cloudflare Workers</span></div>
                     </div>
                     <a class="project-link" href="https://github.com/topher1993/QuickScan" target="_blank" rel="noreferrer" aria-label="View QuickScan Pay source code on GitHub">View repository <span aria-hidden="true">↗</span></a>
                 </article>
 
                 <article class="project-card project-compact project-cad reveal">
                     <div class="project-topline">
-                        <span class="project-number">04</span>
+                        <span class="project-number">05</span>
                         <span class="project-status">Professional work</span>
                     </div>
                     <div class="project-content">
@@ -299,6 +319,6 @@
         <p class="persona-disclosure" id="persona-disclosure">Curated portfolio knowledge · MiniMax ready</p>
     </aside>
 
-    <script src="./script/script.js?v=20260720-minimax-live" defer></script>
+    <script src="./script/script.js?v=20260801-scheduler" defer></script>
 </body>
 </html>
