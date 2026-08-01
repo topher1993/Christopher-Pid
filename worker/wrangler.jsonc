@@ -6,7 +6,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "vars": {
-    "MINIMAX_MODEL": "MiniMax-M2.7",
+    "MINIMAX_MODEL": "MiniMax-M3",
     "ALLOWED_ORIGINS": "https://christopher-portfolio93.web.app,https://topher1993.github.io,http://127.0.0.1:8085,http://localhost:8085"
   },
   "secrets": {

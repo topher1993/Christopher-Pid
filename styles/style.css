@@ -508,6 +508,14 @@ img {
     background: linear-gradient(150deg, rgba(121, 168, 255, 0.13), transparent 55%), var(--panel);
 }
 
+.project-wide {
+    grid-column: 1 / -1;
+}
+
+.project-scheduler {
+    background: linear-gradient(135deg, rgba(92, 229, 196, 0.15), transparent 48%), linear-gradient(315deg, rgba(121, 168, 255, 0.1), transparent 50%), var(--panel);
+}
+
 .project-stronghold {
     background: linear-gradient(150deg, rgba(201, 255, 87, 0.12), transparent 55%), var(--panel);
 }
@@ -583,6 +591,11 @@ img {
     position: relative;
     z-index: 1;
     font-size: 0.9rem;
+}
+
+.project-link-muted {
+    color: var(--muted);
+    cursor: default;
 }
 
 .project-compact {
@@ -1237,6 +1250,10 @@ img {
     .project-card,
     .project-compact {
         min-height: 440px;
+    }
+
+    .project-wide {
+        grid-column: auto;
     }
 
     .all-work,

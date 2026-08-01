@@ -288,6 +288,10 @@ const personaAnswers = [
         answer: 'Christopher has more than a decade of experience across CATIA V5, surface and part design, assemblies, drafting, CAD/CAM, and manufacturing workflows. His strongest value is turning that specialist engineering knowledge into reusable parametric methods and automation.'
     },
     {
+        keywords: ['scheduler', 'resource scheduler', 'engineering resource', 'guest engineer', 'fastapi', 'pwa'],
+        answer: 'Engineering Resource Scheduler is Christopher’s newest project: a production-ready, local-first desktop and PWA system for coordinating in-house and guest engineers. It replaces spreadsheet planning with role-aware workflows, schedule-conflict detection, transactional Excel and CSV migration, audit logs, notifications, and resilient SQLite backup and restore.'
+    },
+    {
         keywords: ['japanese', 'tutor', 'learning'],
         answer: 'Japanese Tutor is an active Expo and React Native learning app with structured lessons, quiz grading, progress and streak services, and an offline-ready data foundation. It demonstrates Christopher’s product thinking, TypeScript implementation, and focus on dependable learning flows.'
     },
@@ -297,11 +301,11 @@ const personaAnswers = [
     },
     {
         keywords: ['quickscan', 'quick scan', 'scanner', 'payment'],
-        answer: 'QuickScan Pay is a mobile-first QR workflow focused on fast, clear transactions. It is one of Christopher’s examples of translating a practical everyday process into a focused digital product.'
+        answer: 'QuickScan Pay is a privacy-conscious payment-screenshot workflow. OCR runs locally in the browser, only extracted text reaches a secret-backed MiniMax M3 Worker, and users must verify the recipient, Philippine mobile number, and amount before opening GCash.'
     },
     {
         keywords: ['project', 'portfolio', 'latest', 'work', 'build'],
-        answer: 'His current portfolio highlights Japanese Tutor, Agent Army Stronghold, QuickScan Pay, and Parametric CAD Workflows. Together they show the full range: mobile products, AI tooling, practical interfaces, and manufacturing automation.'
+        answer: 'His current portfolio highlights Engineering Resource Scheduler, Japanese Tutor, Agent Army Stronghold, QuickScan Pay, and Parametric CAD Workflows. Together they show the full range: engineering operations, mobile products, AI tooling, practical interfaces, and manufacturing automation.'
     },
     {
         keywords: ['react', 'typescript', 'python', 'software', 'developer', 'code'],
@@ -384,7 +388,7 @@ async function submitPersonaQuestion(question) {
         appendPersonaMessage(answer, 'ai');
         if (personaDisclosure) {
             personaDisclosure.textContent = miniMaxAnswer
-                ? 'Powered by MiniMax M2.7 · Curated Christopher knowledge'
+                ? 'Powered by MiniMax M3 · Curated Christopher knowledge'
                 : 'Curated portfolio knowledge · MiniMax ready';
         }
     } catch (error) {

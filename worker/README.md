@@ -1,6 +1,6 @@
 # Christopher AI MiniMax proxy
 
-This Worker keeps the MiniMax API key off the public portfolio and sends bounded chat requests to `MiniMax-M2.7`.
+This Worker keeps the MiniMax API key off the public portfolio and sends bounded chat requests to `MiniMax-M3`.
 
 ## Setup
 
